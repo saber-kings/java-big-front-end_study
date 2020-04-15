@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>xgmm</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<link href="resources/css/jquery-ui-themes.css" type="text/css" rel="stylesheet" />
+		<link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet" />
+		<link href="data/styles.css" type="text/css" rel="stylesheet" />
+		<link href="files/xgmm/styles.css" type="text/css" rel="stylesheet" />
+		<style>
+			[v-cloak] { display: none }
+		</style>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/axios.min.js"></script>
+	</head>
+	<body>
+		<div id="base" class="">
+
+			<!-- Unnamed (组 合) -->
+			<div id="u0" class="ax_default" data-left="104" data-top="130" data-width="564" data-height="231">
+
+				<!-- Unnamed (矩形) -->
+				<div id="u1" class="ax_default _二级标题">
+					<div id="u1_div" class=""></div>
+					<div id="u1_text" class="text ">
+						<p><span>原密码：</span></p>
+					</div>
+				</div>
+
+				<!-- Unnamed (矩形) -->
+				<div id="u2" class="ax_default _二级标题">
+					<div id="u2_div" class=""></div>
+					<div id="u2_text" class="text ">
+						<p><span>新密码：</span></p>
+					</div>
+				</div>
+
+				<!-- Unnamed (矩形) -->
+				<div id="u3" class="ax_default _二级标题">
+					<div id="u3_div" class=""></div>
+					<div id="u3_text" class="text ">
+						<p><span>确认密码：</span></p>
+					</div>
+				</div>
+
+				<!-- Unnamed (文本框) -->
+				<div id="u4" class="ax_default text_field">
+					<input id="u4_input" type="password" value="" v-model="opwd" />
+				</div>
+
+				<!-- Unnamed (文本框) -->
+				<div id="u5" class="ax_default text_field">
+					<input id="u5_input" type="password" value="" v-model="npwd" />
+				</div>
+
+				<!-- Unnamed (文本框) -->
+				<div id="u6" class="ax_default text_field">
+					<input id="u6_input" type="password" value="" v-model="rnpwd" />
+				</div>
+
+				<!-- Unnamed (矩形) -->
+				<div id="u7" class="ax_default _三级标题" v-show="showo" v-cloak>
+					<div id="u7_div" class=""></div>
+					<div id="u7_text" class="text ">
+						<p><span>原密码不正确</span></p>
+					</div>
+				</div>
+
+				<!-- Unnamed (矩形) -->
+				<div id="u8" class="ax_default _三级标题" v-show="shown" v-cloak>
+					<div id="u8_div" class=""></div>
+					<div id="u8_text" class="text ">
+						<p><span>密码长度要求8位以上</span></p>
+					</div>
+				</div>
+
+				<!-- Unnamed (矩形) -->
+				<div id="u9" class="ax_default _三级标题" v-show="showr" v-cloak>
+					<div id="u9_div" class=""></div>
+					<div id="u9_text" class="text ">
+						<p><span>两次密码输入不一致</span></p>
+					</div>
+				</div>
+
+				<!-- Unnamed (矩形) -->
+				<div id="u10" class="ax_default primary_button" style="cursor: pointer;" v-show="showButton" @click="submit();"
+				 v-cloak>
+					<div id="u10_div" class=""></div>
+					<div id="u10_text" class="text ">
+						<p><span>确认修改</span></p>
+					</div>
+				</div>
+
+				<!-- Unnamed (矩形) -->
+				<div id="u11" class="ax_default primary_button" style="cursor: pointer;" @click="reset();">
+					<div id="u11_div" class=""></div>
+					<div id="u11_text" class="text ">
+						<p><span>重&emsp;&emsp;置</span></p>
+					</div>
+				</div>
+			</div>
+			<script>
+				var app1 = new Vue({
+					el: "#u0",
+					data: {
+						opwd: "",
+						npwd: "",
+						rnpwd: "",
+						ropwd: "",
+						showo: false,
+						shown: false,
+						showr: false
+					},
+					created: function() {
+						var uid = window.localStorage.getItem("uid");
+						axios.get("../getPwd?uid=" + uid)
+							.then((res) => {
+								// alert(res.data);
+								app1.ropwd = res.data.upwd;
+							})
+							.catch((error) => {
+								console.log(error); //异常
+							});
+					},
+					computed: {
+						showButton: function() {
+							if (this.opwd == "" || this.npwd == "" || this.rnpwd == "") {
+								return false;
+							} else {
+								return !this.showo & !this.shown & !this.showr;
+							}
+						}
+					},
+					methods: {
+						reset: function() {
+							this.opwd = "";
+							this.npwd = "";
+							this.rnpwd = "";
+						},
+						submit: function() {
+							var uid = window.localStorage.getItem("uid");
+							axios.get("../changePwd?uid=" + uid + "&pwd=" + this.npwd)
+								.then((res) => {
+									var r1 = res.data;
+									if (r1.msg == "success") {
+										alert("修改成功");
+									} else {
+										alert("修改失败");
+									}
+								})
+								.catch((error) => {
+									console.log(error); //异常
+								});
+						}
+					},
+					watch: {
+						opwd: function(newval) {
+							if (newval == "") {
+								this.showo = false;
+							} else if (newval == this.ropwd) {
+								this.showo = false;
+							} else {
+								this.showo = true;
+							}
+						},
+						npwd: function(newval) {
+							if (newval.length < 8 && newval.length >= 1) {
+								this.shown = true;
+							} else {
+								this.shown = false;
+							}
+						},
+						rnpwd: function(newval) {
+							if (newval == "") {
+								this.showr = false;
+							} else if (newval == this.npwd && this.npwd != "") {
+								this.showr = false;
+							} else {
+								this.showr = true;
+							}
+						}
+					}
+				});
+			</script>
+		</div>
+	</body>
+</html>

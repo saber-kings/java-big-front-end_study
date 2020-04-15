@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title></title>
+		<link rel="stylesheet" href="css/style.css" />
+		<style>
+			.iframe-style {
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				border: none;
+			}
+			[v-cloak] { display: none }
+		</style>
+		<script src="js/vue.min.js"></script>
+		<script src="js/axios.min.js"></script>
+	</head>
+	<body>
+		<div id="sitemain">
+			<div id="logo2"> <img src="images/logo1.gif" alt=""> </div>
+			<div id="emptybox">
+				<div class="lb">
+					<div class="lr">
+						<div class="lt">
+							<div class="ll" v-cloak>欢迎你：{{uid}},{{realName}}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="group">
+				<div id="menu">
+					<ul>
+						<li v-for="m in menus" v-cloak><a href="" :href="m.murl" target="f1">{{m.menuText}}</a></li>
+					</ul>
+				</div>
+				<div id="emptybox2">
+					<div class="lb">
+						<div class="lr">
+							<div class="lt">
+								<div class="ll">
+									<iframe id="f1" name="f1" class="iframe-style" src="welcome.html"></iframe>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			var app1 = new Vue({
+				el: "#sitemain",
+				data: {
+					uid: 0,
+					realName: "",
+					menus: []
+				},
+				created: function() {
+					this.uid = window.localStorage.getItem("uid");
+					this.realName = window.localStorage.getItem("realName");
+					axios.get("getMenus?uid=" + this.uid)
+						.then((res) => {
+							// alert(res.data);
+							app1.menus = res.data;
+						})
+						.catch((error) => {
+							console.log(error); //异常
+						});
+				}
+			});
+		</script>
+	</body>
+</html>
