@@ -17,7 +17,7 @@ public class GoodDao {
 
 	public Boolean save(Good good) {
 		String sql = "insert into t_good(g_name,g_price,g_stuff,g_desc) values(?,?,?,?)";
-		int num = DH.update(sql, good.getgName(), good.getgPrice(), good.getgStuff(), good.getgDesc());
+		int num = DH.update(sql, good.getGName(), good.getGPrice(), good.getGStuff(), good.getGDesc());
 		if (num > 0) {
 			return true;
 		} else {
@@ -41,9 +41,9 @@ public class GoodDao {
 			sql = sql + " and id = ?";
 			params.add(good.getId());
 		}
-		if (StringUtils.isNotBlank(good.getgName())) {
+		if (StringUtils.isNotBlank(good.getGName())) {
 			sql = sql + " and g_name like ?";
-			params.add("%" + good.getgName().trim() + "%");
+			params.add("%" + good.getGName().trim() + "%");
 		}
 		// 最高价格
 		if (maxPrice != 0.0) {
@@ -55,13 +55,13 @@ public class GoodDao {
 			sql = sql + " and g_price > ?";
 			params.add(minPrice);
 		}
-		if (StringUtils.isNotBlank(good.getgStuff())) {
+		if (StringUtils.isNotBlank(good.getGStuff())) {
 			sql = sql + " and g_stuff like ?";
-			params.add("%" + good.getgStuff().trim() + "%");
+			params.add("%" + good.getGStuff().trim() + "%");
 		}
-		if (StringUtils.isNotBlank(good.getgDesc())) {
+		if (StringUtils.isNotBlank(good.getGDesc())) {
 			sql = sql + " and g_desc like ?";
-			params.add("%" + good.getgDesc().trim() + "%");
+			params.add("%" + good.getGDesc().trim() + "%");
 		}
 		if (params.size()!=0) {
 			for (Object param : params) {
@@ -75,7 +75,7 @@ public class GoodDao {
 
 	public Boolean update(Good good) {
 		String sql = "update t_good set g_name=?,g_price=?,g_stuff=?,g_desc=? where id=?";
-		int num = DH.update(sql, good.getgName(), good.getgPrice(), good.getgStuff(), good.getgDesc(), good.getId());
+		int num = DH.update(sql, good.getGName(), good.getGPrice(), good.getGStuff(), good.getGDesc(), good.getId());
 		if (num > 0) {
 			return true;
 		} else {

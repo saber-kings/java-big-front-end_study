@@ -1,4 +1,4 @@
-package com.saberking.web;
+package com.saberking.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -9,26 +9,27 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.saberking.service.MenuService;
+import com.saberking.service.UserService;
 
 import lombok.Cleanup;
 
-@WebServlet("/getMenus")
-public class GetMenus extends HttpServlet {
+@WebServlet("/mlogin")
+public class MobileLogin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private MenuService menuService = new MenuService();
+	private UserService userService = new UserService();
 
-	public GetMenus() {
+	public MobileLogin() {
 		super();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// 第一步，接收参数
-		String uid = request.getParameter("uid");
+		String phone = request.getParameter("phone");
+		String upwd = request.getParameter("upwd");
 		// 第二步，处理业务
-		String s = menuService.getByUid(uid);
+		String s = userService.mLogin(phone, upwd);
 		// 第三步，输出
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");

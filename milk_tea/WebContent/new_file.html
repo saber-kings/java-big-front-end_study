@@ -7,6 +7,7 @@
 			var w;
 
 			function init() {
+				var uid = window.localStorage.getItem("uid");
 				w = new WebSocket("ws://localhost:8989/milk_tea/echo/1");
 				w.onopen = function() {
 

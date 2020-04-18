@@ -14,27 +14,18 @@ import com.saberking.pojo.Good;
 import com.saberking.service.GoodService;
 import com.saberking.utils.RequestToBean;
 
-/**
- * Servlet implementation class GoodList
- */
+import lombok.Cleanup;
+
 @WebServlet("/getGoods")
 public class GetGoods extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private GoodService goodService = new GoodService();
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public GetGoods() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// 第一步，接收参数
@@ -43,17 +34,12 @@ public class GetGoods extends HttpServlet {
 		// 第三步，输出
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
+		@Cleanup PrintWriter out = response.getWriter();
 
 		out.println(s);
 		out.flush();
-		out.close();
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// 第一步，接收参数
@@ -64,11 +50,10 @@ public class GetGoods extends HttpServlet {
 		// 第三步，输出
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
+		@Cleanup PrintWriter out = response.getWriter();
 
 		out.println(s);
 		out.flush();
-		out.close();
 	}
 
 }

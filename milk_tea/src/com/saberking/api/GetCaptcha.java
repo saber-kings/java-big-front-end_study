@@ -1,4 +1,4 @@
-package com.saberking.web;
+package com.saberking.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -9,32 +9,33 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.saberking.service.MenuService;
-
 import lombok.Cleanup;
 
-@WebServlet("/getMenus")
-public class GetMenus extends HttpServlet {
+@WebServlet("/getCaptcha")
+public class GetCaptcha extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private MenuService menuService = new MenuService();
-
-	public GetMenus() {
+	public GetCaptcha() {
 		super();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// 第一步，接收参数
-		String uid = request.getParameter("uid");
+//		String phone = request.getParameter("phone");
 		// 第二步，处理业务
-		String s = menuService.getByUid(uid);
+		// 使用自己写的方法生成6位随机数
+//		String myCode = SendMsgCode.createRandomVcode();
+		// 使用 commons-lang 工具类，生成6位随机数
+//		String code = RandomStringUtils.randomNumeric(6);
+		// 调用 sdk 发送短信验证码
+//		SendMsgCode.sendCode(phone, code);
 		// 第三步，输出
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");
 		@Cleanup PrintWriter out = response.getWriter();
 
-		out.println(s);
+		out.println("{\"code\":\"456789\"}");
 		out.flush();
 	}
 

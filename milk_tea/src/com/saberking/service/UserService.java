@@ -10,21 +10,42 @@ public class UserService {
 
 	public String login(String un, String up) {
 		User user = userDao.login(un, up);
-		if (user==null) {
+		if (user == null) {
 			return "{\"msg\":\"error\"}";
 		} else {
+			Singleton singleton = Singleton.getSingleton();
+			Boolean b = singleton.isUser(String.valueOf(user.getId()));
+			if (b) {
 //			System.out.println("=================方式一："+JSON.toJSONString(u1));
 //			System.out.println("=================方式二："+JSON.toJSON(u1).toString());
 //			System.out.println("=================方式三："+JSON.toJSONString(u1, SerializerFeature.WriteMapNullValue));
-			return JSON.toJSON(user).toString();
+				return JSON.toJSON(user).toString();
+			} else {
+				return "{\"msg\":\"logined\"}";
+			}
 		}
 	}
-	
+
+	public String mLogin(String phone, String upwd) {
+		User user = userDao.mLogin(phone, upwd);
+		if (user == null) {
+			return "{\"msg\":\"error\"}";
+		} else {
+			Singleton singleton = Singleton.getSingleton();
+			Boolean b = singleton.isUser(String.valueOf(user.getId()));
+			if (b) {
+				return JSON.toJSON(user).toString();
+			} else {
+				return "{\"msg\":\"logined\"}";
+			}
+		}
+	}
+
 	public String getPwd(String uid) {
 		User user = userDao.loginedGetById(uid);
 		return JSON.toJSON(user).toString();
 	}
-	
+
 	public String changePwd(String id, String newPwd) {
 		Boolean b = userDao.changePwd(id, newPwd);
 		if (b) {

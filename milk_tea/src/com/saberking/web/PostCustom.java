@@ -9,19 +9,20 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.saberking.pojo.Good;
-import com.saberking.service.GoodService;
+import com.alibaba.fastjson.JSON;
+import com.saberking.pojo.Custom;
+import com.saberking.service.CustomService;
 import com.saberking.utils.RequestToBean;
 
 import lombok.Cleanup;
 
-@WebServlet("/putGood")
-public class PutGood extends HttpServlet {
+@WebServlet("/postCustom")
+public class PostCustom extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private GoodService goodService = new GoodService();
+	private CustomService customService = new CustomService();
 
-	public PutGood() {
+	public PostCustom() {
 		super();
 	}
 
@@ -32,14 +33,16 @@ public class PutGood extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// 第一步，接收参数
-		//方法一：用 axios 的 POST 提交 JSON 格式的数据，所以使用 fastjson 转换成 javabean 对象
-//		Good good = JSON.parseObject(RequestToBean.getRequestPostStr(request), Good.class);
-		//方法二：用 mui 的 POST 方式提交正常接收
-		Good good = RequestToBean.getBeanToRequest(request, Good.class);
-		//打印添加的商品信息
-//		System.out.println(good);
+		Custom custom = JSON.parseObject(RequestToBean.getRequestPostStr(request), Custom.class);
 		// 第二步，处理业务
-		String s = goodService.add(good);
+		String s;
+		if (custom.getId() == 0) {
+			//添加
+			s = customService.add(custom);
+		} else {
+			//删除
+			s = customService.update(custom);
+		}
 		// 第三步，输出
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");

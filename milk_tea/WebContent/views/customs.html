@@ -3,13 +3,13 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>商品管理</title>
+		<title>客户管理</title>
 		<link href="../css/bootstrap.min.css" rel="stylesheet" />
 		<link href="../css/bootstrap-theme.min.css" rel="stylesheet" />
 		<link href="../css/animate.min.css" rel="stylesheet" />
 		<script src="../js/vue.min.js"></script>
 		<script src="../js/axios.min.js"></script>
-		<script src="../js/mui.min.js"></script>
+		<script src="../js/moment.min.js"></script>
 		<style>
 			.t123 {
 				position: absolute;
@@ -48,7 +48,7 @@
 				width: 300px;
 				height: 40px;
 				margin: 0 auto;
-				margin-top: -440px;
+				margin-top: -320px;
 				background-color: rgba(0, 0, 0, .1);
 				border-radius: 3px;
 				color: red;
@@ -157,6 +157,13 @@
 				border-radius: 4px;
 			}
 			
+			input[type="email"]{
+				width: 100%;
+				height: 60%;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+			}
+			
 			textarea {
 				border: 1px solid #ccc;
 				border-radius: 4px;
@@ -218,75 +225,61 @@
 			<transition leave-active-class="animated fadeOut" enter-active-class="animated fadeIn">
 				<div class="t123" v-show="showMask" v-cloak>
 					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
-						<div class="t456" v-show="showAdd">
+						<div class="t456" style="height: 260px;" v-show="showAdd">
 							<a href="javascript:void(0);" class="my-close-btn" style="float: right;position: relative;top: -30px;" @click="closeAdd();">
 								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 							</a>
 							<div class="vl">
-								<div class="left1">商品名称：</div>
+								<div class="left1">客户姓名：</div>
 								<div class="right1">
-									<input type="text" v-model="addG.gName" />
-									<div class="warning-center-input-text">请输入商品名称</div>
+									<input type="text" v-model="addC.cname" />
+									<div class="warning-center-input-text">请输入客户姓名</div>
 								</div>
 							</div>
 							<div class="vl">
-								<div class="left1">商品单价：</div>
+								<div class="left1">客户手机：</div>
 								<div class="right1">
-									<input type="text" onkeyup="value=value.replace(/[^\-?\d.]/g,'')" style="width: 20% !important;" v-model="addG.gPrice" />￥
-									<div class="warning-center-input-text">必须为数字</div>
+									<input type="text" onkeyup="value=value.replace(/[^\-?\d.]/g,'')" v-model="addC.phone" />
+									<div class="warning-center-input-text">请输入客户手机号</div>
 								</div>
 							</div>
 							<div class="vl">
-								<div class="left1">商品原材料：</div>
+								<div class="left1">客户邮箱：</div>
 								<div class="right1">
-									<input type="text" v-model="addG.gStuff" />
-									<div class="warning-center-input-text">请输入商品原材料</div>
-								</div>
-							</div>
-							<div class="vl" style="height: 120px !important;">
-								<div class="left1">说明：</div>
-								<div class="right1" style="height: 100px;padding-top: 10px;">
-									<textarea style="width: 100%;height: 100px;" v-model="addG.gDesc"></textarea>
-									<div class="warning-center-input-text" style="top: -120px !important;">请输入商品名称</div>
+									<input type="email" v-model="addC.email" />
+									<div class="warning-center-input-text">请输入客户邮箱</div>
 								</div>
 							</div>
 							<div class="vl vl-btn">
-								<div class="btn btn-success btn-sm" v-show="showAddBtn" @click="submitAddMui();">提交</div>
+								<div class="btn btn-success btn-sm" v-show="showAddBtn" @click="submitAdd();">提交</div>
 								<div class="btn btn-default btn-sm" style="float: right;" @click="closeAdd();">取消</div>
 							</div>
 						</div>
 					</transition>
 					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
-						<div class="t456" v-show="showEdit">
+						<div class="t456" style="height: 260px;" v-show="showEdit">
 							<a href="javascript:void(0);" class="my-close-btn" style="float: right;position: relative;top: -30px;" @click="cancelEdit();">
 								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 							</a>
 							<div class="vl">
-								<div class="left1">商品名称：</div>
+								<div class="left1">客户姓名：</div>
 								<div class="right1">
-									<input type="text" v-model="editG.gName" />
-									<div class="warning-center-input-text">请输入商品名称</div>
+									<input type="text" v-model="editC.cname" />
+									<div class="warning-center-input-text">请输入客户姓名</div>
 								</div>
 							</div>
 							<div class="vl">
-								<div class="left1">商品单价：</div>
+								<div class="left1">客户手机：</div>
 								<div class="right1">
-									<input type="text" onkeyup="value=value.replace(/[^\-?\d.]/g,'')" style="width: 20% !important;" v-model="editG.gPrice" />￥
-									<div class="warning-center-input-text">必须为数字</div>
+									<input type="text" onkeyup="value=value.replace(/[^\-?\d.]/g,'')" v-model="editC.phone" />
+									<div class="warning-center-input-text">请输入客户手机号</div>
 								</div>
 							</div>
 							<div class="vl">
-								<div class="left1">商品原材料：</div>
+								<div class="left1">客户邮箱：</div>
 								<div class="right1">
-									<input type="text" v-model="editG.gStuff" />
-									<div class="warning-center-input-text">请输入商品原材料</div>
-								</div>
-							</div>
-							<div class="vl" style="height: 120px !important;">
-								<div class="left1">说明：</div>
-								<div class="right1" style="height: 100px;padding-top: 10px;">
-									<textarea style="width: 100%;height: 100px;" v-model="editG.gDesc"></textarea>
-									<div class="warning-center-input-text" style="top: -120px !important;">请输入商品说明</div>
+									<input type="email" v-model="editC.email" />
+									<div class="warning-center-input-text">请输入客户邮箱</div>
 								</div>
 							</div>
 							<div class="vl vl-btn">
@@ -311,23 +304,23 @@
 			<div class="container-fluid row" style="margin-top: 20px;">
 				<div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 padding-none">
 					<div class="input-group" style="display: block;">
-						<input type="text" class="form-control" onfocus="this.placeholder=''" onblur="this.placeholder='商品名称'" style="border-radius: 3px;"
-						 placeholder="商品名称" v-model="sG.gName">
-						<div class="info-center-input-text">商品名称</div>
+						<input type="text" class="form-control" onfocus="this.placeholder=''" onblur="this.placeholder='客户名称'" style="border-radius: 3px;"
+						 placeholder="客户姓名" v-model="sC.cname">
+						<div class="info-center-input-text">客户姓名</div>
 					</div>
 				</div>
 				<div class="col-lg-1 col-md-2 col-sm-2 col-xs-3 padding-none margin-left-sm media-margin-left-sm">
 					<div class="input-group" style="display: block;">
-						<input type="text" class="form-control" onfocus="this.placeholder=''" onblur="this.placeholder='商品原材料'" style="border-radius: 3px;"
-						 placeholder="商品原材料" v-model="sG.gStuff">
-						<div class="info-center-input-text">商品原材料</div>
+						<input type="text" class="form-control" onfocus="this.placeholder=''" onblur="this.placeholder='客户原材料'" style="border-radius: 3px;"
+						 placeholder="客户手机" v-model="sC.phone">
+						<div class="info-center-input-text">客户手机</div>
 					</div>
 				</div>
 				<div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 padding-none margin-left-sm media-margin-left-sm">
 					<div class="input-group" style="display: block;">
-						<input type="text" class="form-control" onfocus="this.placeholder=''" onblur="this.placeholder='商品说明'" style="border-radius: 3px;"
-						 placeholder="商品说明" v-model="sG.gDesc">
-						<div class="info-center-input-text">商品说明</div>
+						<input type="email" class="form-control" onfocus="this.placeholder=''" onblur="this.placeholder='客户说明'" style="border-radius: 3px;"
+						 placeholder="客户邮箱" v-model="sC.email">
+						<div class="info-center-input-text">客户邮箱</div>
 					</div>
 				</div>
 				<div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 padding-none margin-left-sm media-margin-left-sm">
@@ -350,27 +343,29 @@
 				<thead>
 					<tr align="center">
 						<td>编号</td>
-						<td>商品名</td>
-						<td>单价</td>
-						<td>原材料</td>
-						<td>说明</td>
+						<td>客户姓名</td>
+						<td>手机</td>
+						<td>邮箱</td>
+						<td>创建时间</td>
+						<td>更新时间</td>
 						<td>操作</td>
 					</tr>
 				</thead>
 				<tbody>
-					<tr align="center" class="ant-table-row" v-for="(g,index) in goods" v-cloak>
+					<tr align="center" class="ant-table-row" v-for="(c,index) in customs" v-cloak>
 						<td>{{index+1}}</td>
-						<td>{{g.gName}}</td>
-						<td>￥{{g.gPrice}}</td>
-						<td>{{g.gStuff}}</td>
-						<td>{{g.gDesc}}</td>
+						<td>{{c.cname}}</td>
+						<td>{{c.phone}}</td>
+						<td>{{c.email}}</td>
+						<td>{{c.created | dateFormat}}</td>
+						<td>{{c.updated | dateFormat}}</td>
 						<td>
 							<a class="btn btn-info btn-xs" v- href="javascript:void(0);" @click="openEdit(index);" v-model="index">
 								<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 								<span>编辑</span>
 							</a>
-							<a class="btn btn-danger btn-xs" style="margin-left: 10px;" v- href="javascript:void(0);" @click="del(g.id);"
-							 v-model="g.id">
+							<a class="btn btn-danger btn-xs" style="margin-left: 10px;" v- href="javascript:void(0);" @click="del(c.id);"
+							 v-model="c.id">
 								<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
 								<span>删除</span>
 							</a>
@@ -383,24 +378,22 @@
 			var app1 = new Vue({
 				el: "#d123",
 				data: {
-					sG: {
-						gName: "",
-						gStuff: "",
-						gDesc: ""
+					sC: {
+						cname: "",
+						phone: "",
+						email: ""
 					},
-					addG: {
-						gName: "",
-						gPrice: 0,
-						gStuff: "",
-						gDesc: "暂无"
+					addC: {
+						cname: "",
+						phone: "",
+						email: ""
 					},
-					editG: {
-						gName: "",
-						gPrice: 0,
-						gStuff: "",
-						gDesc: "暂无"
+					editC: {
+						cname: "",
+						phone: "",
+						email: ""
 					},
-					goods: [],
+					customs: [],
 					showMask: false,
 					showAdd: false,
 					showEdit: false,
@@ -409,9 +402,9 @@
 					info: ""
 				},
 				created: function() {
-					axios.get("../getGoods")
+					axios.get("../getCustoms")
 						.then((res) => {
-							app1.goods = res.data;
+							app1.customs = res.data;
 						})
 						.catch((error) => {
 							console.log(error); //异常
@@ -419,16 +412,14 @@
 				},
 				computed: {
 					showAddBtn: function() {
-						if (this.addG.gName == "" || this.addG.gPrice == 0 || this.addG.gPrice == "" || this.addG.gStuff == "" || this
-							.addG.gDesc == "") {
+						if (this.addC.cname == "" || this.addC.phone == "" || this.addC.email == "") {
 							return false;
 						} else {
 							return true;
 						}
 					},
 					showEditBtn: function() {
-						if (this.editG.gName == "" || this.editG.gPrice == 0 || this.editG.gPrice == "" || this.editG.gStuff == "" ||
-							this.editG.gDesc == "") {
+						if (this.editC.cname == "" || this.editC.phone == "" || this.editC.email == "") {
 							return false;
 						} else {
 							return true;
@@ -444,10 +435,9 @@
 						this.showMask = false;
 					},
 					openAdd: function() {
-						this.addG.gName = "";
-						this.addG.gPrice = 0;
-						this.addG.gStuff = "";
-						this.addG.gDesc = "暂无";
+						this.addC.cname = "";
+						this.addC.phone = "";
+						this.addC.email = "";
 						this.showMask = true;
 						this.showAdd = true;
 					},
@@ -456,7 +446,7 @@
 						this.showMask = false;
 					},
 					openEdit: function(index) {
-						this.editG = this.goods[index];
+						this.editC = this.customs[index];
 						this.showMask = true;
 						this.showEdit = true;
 					},
@@ -495,11 +485,11 @@
 					search: function() {
 						axios({
 								method: "post",
-								url: "../getGoods",
-								data: this.sG
+								url: "../getCustoms",
+								data: this.sC
 							})
 							.then((res) => {
-								this.goods = res.data;
+								this.customs = res.data;
 							})
 							.catch((error) => {
 								console.log(error); //异常
@@ -511,26 +501,22 @@
 						this.showMask = false;
 					},
 					submitAdd: function() {
-						if (isNaN(this.addG.gPrice)) {
-							this.propError("价格必须是数值类型");
+						if (!(/^1[3456789]\d{9}$/.test(this.addC.phone))) {
+							this.propError("手机号有误，请重填");
+						} else if (!(/^([a-zA-Z0-9._-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/.test(this.addC.email))) {
+							this.propError("邮箱格式有误，请重填");
 						} else {
 							axios({
 									method: "post",
-									url: "../putGood",
-									data: this.addG
+									url: "../postCustom",
+									data: this.addC
 								})
 								.then((res) => {
 									var r1 = res.data;
 									if (r1.msg == "success") {
-										axios.get("../getGoods")
-											.then((res) => {
-												this.goods = res.data;
-												this.closeAdd();
-												this.propInfo("添加成功");
-											})
-											.catch((error) => {
-												console.log(error); //异常
-											});
+										this.search();
+										this.closeAdd();
+										this.propInfo("添加成功");
 									} else {
 										this.propError("添加失败");
 									}
@@ -540,60 +526,23 @@
 								});
 						}
 					},
-					submitAddMui: function() {
-						if (isNaN(this.addG.gPrice)) {
-							// alert("价格必须是数值类型");
-							this.propError("价格必须是数值类型");
-						} else {
-							mui.ajax("../putGood", {
-								data: app1.addG,
-								dataType: 'json', //服务器返回json格式数据
-								type: 'post', //HTTP请求类型
-								timeout: 10000, //超时时间设置为10秒；
-								success: function(data) {
-									if (data.msg == "success") {
-										axios.get("../getGoods")
-											.then((res) => {
-												app1.goods = res.data;
-												app1.closeAdd();
-												this.propInfo("添加成功");
-											})
-											.catch((error) => {
-												console.log(error); //异常
-											});
-									} else {
-										app1.propError("添加失败");
-									}
-								},
-								error: function(xhr, type, errorThrown) {
-									//异常处理；
-									// alert(type);
-									app1.propError(type);
-								}
-							});
-						}
-					},
 					submitEdit: function() {
-						if (isNaN(this.editG.gPrice)) {
-							this.propError("价格必须是数值类型");
+						if (!(/^1[3456789]\d{9}$/.test(this.editC.phone))) {
+							this.propError("手机号有误，请重填");
+						} else if (!(/^([a-zA-Z0-9._-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/.test(this.editC.email))) {
+							this.propError("邮箱格式有误，请重填");
 						} else {
 							axios({
 									method: "post",
-									url: "../editGood",
-									data: this.editG
+									url: "../postCustom",
+									data: this.editC
 								})
 								.then((res) => {
 									var r1 = res.data;
 									if (r1.msg == "success") {
-										axios.get("../getGoods")
-											.then((res) => {
-												this.goods = res.data;
-												this.closeEdit();
-												this.propInfo("修改成功");
-											})
-											.catch((error) => {
-												console.log(error); //异常
-											});
+										this.search();
+										this.closeEdit();
+										this.propInfo("修改成功");
 									} else {
 										this.propError("修改失败");
 									}
@@ -604,28 +553,30 @@
 						}
 					},
 					del: function(id) {
-						axios.get("../delGood?uid=" + id)
+						axios.get("../delCustom?cid=" + id)
 							.then((res) => {
 								var r1 = res.data;
 								if (r1.msg == "success") {
-									axios.get("../getGoods")
-										.then((res) => {
-											this.goods = res.data;
-											this.propInfo("删除成功");
-										})
-										.catch((error) => {
-											console.log(error); //异常
-										});
+									this.search();
+									this.propInfo("删除成功");
 								} else {
 									document.getElementsByClassName("info")[0].style.color = "red";
 									this.propInfo("删除失败");
-									document.getElementsByClassName("info")[0].style.color = "white";
+									setTimeout(function() {
+										document.getElementsByClassName("info")[0].style.color = "white";
+									}, 4000);
 								}
 							})
 							.catch((error) => {
 								console.log(error); //异常
 							});
 					}
+				},
+				filters: {
+					/*日期处理*/
+					dateFormat(date) {
+						return moment(date).format("YYYY-MM-DD");
+					},
 				}
 			});
 		</script>

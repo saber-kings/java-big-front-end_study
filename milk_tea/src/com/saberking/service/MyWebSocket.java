@@ -14,13 +14,16 @@ public class MyWebSocket {
 	//连接创建成功时
 	@OnOpen
 	public void open(Session session,@PathParam(value="id")String id) {
-		System.out.println(id);
+		System.out.println(id+"已连接上");
+		Singleton singleton = Singleton.getSingleton();
+		singleton.saveUser(id, session);
 	}
 
 	//连接关闭时
 	@OnClose
 	public void close(@PathParam(value="id")String id) {
-		
+		Singleton singleton = Singleton.getSingleton();
+		singleton.removeUser(id);
 	}
 	
 	//连接出错时

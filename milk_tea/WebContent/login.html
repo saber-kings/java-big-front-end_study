@@ -6,6 +6,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 		<link rel="stylesheet" media="screen" href="css/login.css">
 		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" href="css/animate.min.css" />
+		<style>
+			[v-cloak] { display: none }
+		</style>
 		<script src="js/vue.min.js"></script>
 		<script src="js/axios.min.js"></script>
 	</head>
@@ -13,6 +17,15 @@
 
 		<div id="particles-js">
 			<div id="base" class="login">
+				<transition leave-active-class="animated fadeOut" enter-active-class="animated fadeIn">
+					<div class="t123" v-show="showMask" v-cloak>
+						<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+							<div class="error" v-show="showError">
+								<div>"{{info}}"</div>
+							</div>
+						</transition>
+					</div>
+				</transition>
 				<div class="login-top">
 					登录
 				</div>
@@ -53,7 +66,10 @@
 				//定义数据
 				data: {
 					un: "",
-					up: ""
+					up: "",
+					showMask: false,
+					showError: false,
+					info: ""
 				},
 				//包含函数
 				methods: {
@@ -61,18 +77,35 @@
 						this.un = "";
 						this.up = "";
 					},
+					openError: function(msg) {
+						this.info = msg;
+						this.showMask = true;
+						this.showError = true;
+					},
+					closeError: function() {
+						this.showError = false;
+						this.showMask = false;
+					},
+					propError: function(msg) {
+						this.openError(msg);
+						setTimeout(function() {
+							app1.closeError();
+						}, 2000);
+					},
 					submit: function() {
 						if (this.un == "") {
-							alert("请输入账号");
+							this.propError("请输入账号");
 						} else if (this.up == "") {
-							alert("请输入密码");
+							this.propError("请输入密码");
 						} else {
 							axios.get("login?un=" + this.un + "&up=" + this.up)
 								.then((res) => {
 									var r1 = res.data;
 									// alert(r1);
 									if (r1.msg == "error") {
-										alert("登陆失败");
+										this.propError("登陆失败");
+									}else if(r1.msg == "logined"){
+										this.propError("用户已登录");
 									} else {
 										window.localStorage.setItem("uid", r1.id);
 										window.localStorage.setItem("realName", r1.realName);

@@ -9,26 +9,26 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.saberking.service.MenuService;
+import com.saberking.service.CustomService;
 
 import lombok.Cleanup;
 
-@WebServlet("/getMenus")
-public class GetMenus extends HttpServlet {
+@WebServlet("/delCustom")
+public class DelCustom extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private MenuService menuService = new MenuService();
+	private CustomService customService = new CustomService();
 
-	public GetMenus() {
+	public DelCustom() {
 		super();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// 第一步，接收参数
-		String uid = request.getParameter("uid");
+		String cid = request.getParameter("cid");
 		// 第二步，处理业务
-		String s = menuService.getByUid(uid);
+		String s = customService.delete(cid);
 		// 第三步，输出
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");

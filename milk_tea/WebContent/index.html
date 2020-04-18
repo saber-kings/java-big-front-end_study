@@ -11,19 +11,39 @@
 				overflow: auto;
 				border: none;
 			}
-			[v-cloak] { display: none }
+
+			[v-cloak] {
+				display: none
+			}
 		</style>
 		<script src="js/vue.min.js"></script>
 		<script src="js/axios.min.js"></script>
+		<script>
+			var w;
+
+			function init() {
+				var uid = window.localStorage.getItem("uid");
+				w = new WebSocket("ws://localhost:8989/milk_tea/echo/" + uid);
+				w.onopen = function() {
+
+				};
+				w.onclose = function() {
+
+				};
+				w.onmessage = function(event) {
+					event.data;
+				};
+			}
+		</script>
 	</head>
-	<body>
+	<body onload="init();">
 		<div id="sitemain">
 			<div id="logo2"> <img src="images/logo1.gif" alt=""> </div>
 			<div id="emptybox">
 				<div class="lb">
 					<div class="lr">
 						<div class="lt">
-							<div class="ll" v-cloak>欢迎你：{{uid}},{{realName}}</div>
+							<div class="ll" v-cloak>欢迎你：{{realName}}</div>
 						</div>
 					</div>
 				</div>

@@ -14,35 +14,22 @@ import com.saberking.pojo.Good;
 import com.saberking.service.GoodService;
 import com.saberking.utils.RequestToBean;
 
-/**
- * Servlet implementation class EditGood
- */
+import lombok.Cleanup;
+
 @WebServlet("/editGood")
 public class EditGood extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private GoodService goodService = new GoodService();
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public EditGood() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// 第一步，接收参数
@@ -55,11 +42,10 @@ public class EditGood extends HttpServlet {
 		// 第三步，输出
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
+		@Cleanup PrintWriter out = response.getWriter();
 
 		out.println(s);
 		out.flush();
-		out.close();
 	}
 
 }
