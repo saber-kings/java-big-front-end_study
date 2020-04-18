@@ -1,0 +1,119 @@
+<%@ jet package="org.eclipse.jst.j2ee.internal.web.operations" 
+	imports="java.util.* org.eclipse.jst.j2ee.internal.common.operations.*" 
+	class="ServletTemplate" 
+%>
+<% CreateServletTemplateModel model = (CreateServletTemplateModel) argument; %>
+<%@ include file="_flags.template" %>
+<%@ include file="_package.template" %>
+<%@ include file="_imports.template" %>
+<%@ include file="servlet_classHeader.template" %>
+<%@ include file="_class.template" %>
+<% 
+	if (model.isGenericServletSuperclass()) { 
+%>
+	private static final long serialVersionUID = 1L;
+<% 
+	} 
+%>
+<%@ include file="_constructors.template" %>
+<%@ include file="_methods.template" %>
+<% if (model.shouldGenInit()) { %>
+
+	public void init(ServletConfig config) throws ServletException {
+	}
+<% } %>
+<% if (model.shouldGenDestroy()) { %>
+
+	public void destroy() {
+	}
+<% } %>
+<% if (model.shouldGenGetServletConfig()) { %>
+
+	public ServletConfig getServletConfig() {
+		return null;
+	}
+<% } %>
+<% if (model.shouldGenGetServletInfo()) { %>
+
+	public String getServletInfo() {
+		return null; 
+	}
+<% } %>
+<% if (model.shouldGenService() && !model.isHttpServletSuperclass()) { %>
+
+	public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+	}
+<% } %>
+<% if (model.shouldGenService() && model.isHttpServletSuperclass()) { %>
+
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+<% } %>
+<% if (model.shouldGenDoGet()) { %>
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// 第一步，接收参数
+		String uid = request.getParameter("");
+		// 第二步，处理业务
+		String s = null;
+		// 第三步，输出
+		response.setCharacterEncoding("utf-8");
+		response.setContentType("text/html");
+		// 如果使用lombok的 @Cleanup: 将自动在最后调用 close() 关闭可关闭流
+		PrintWriter out = response.getWriter();
+
+		out.println(s);
+		out.flush();
+		out.close();
+	}
+<% } %>
+<% if (model.shouldGenDoPost()) { %>
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<% if (model.shouldGenDoGet()) { %>
+		// 第一步，接收参数，以下可能用到阿里巴巴的 fastjson 组件，必须用到工具类：RequestToBean
+		//方法一：用 axios 的 POST 提交 JSON 格式的数据，所以使用 fastjson 转换成 javabean 对象
+//		Good good = JSON.parseObject(RequestToBean.getRequestPostStr(request), Good.class);
+		//方法二：用 mui 的 POST 方式提交正常接收
+//		Good good = RequestToBean.getBeanToRequest(request, Good.class);
+		// 第二步，处理业务
+		String s = null;
+		// 第三步，输出
+		response.setCharacterEncoding("utf-8");
+		response.setContentType("text/html");
+		// 如果使用lombok的 @Cleanup: 将自动在最后调用 close() 关闭可关闭流
+		PrintWriter out = response.getWriter();
+
+		out.println(s);
+		out.flush();
+		out.close();
+<% } %>
+	}
+<% } %>
+<% if (model.shouldGenDoPut()) { %>
+
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+<% } %>
+<% if (model.shouldGenDoDelete()) { %>
+
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+<% } %>
+<% if (model.shouldGenDoHead()) { %>
+
+	protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+<% } %>
+<% if (model.shouldGenDoOptions()) { %>
+
+	protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+<% } %>
+<% if (model.shouldGenDoTrace()) { %>
+
+	protected void doTrace(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+<% } %>
+
+}

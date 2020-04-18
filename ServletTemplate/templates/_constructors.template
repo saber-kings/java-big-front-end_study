@@ -1,0 +1,23 @@
+<% 
+	if (!model.hasEmptySuperclassConstructor()) { 
+%>
+
+    public <%= model.getClassName() %>() {
+    }
+<% 
+	} 
+
+	if (model.shouldGenSuperclassConstructors()) {
+		List<Constructor> constructors = model.getConstructors();
+		for (Constructor constructor : constructors) {
+			if (constructor.isPublic() || constructor.isProtected()) { 
+%>
+       
+    public <%= model.getClassName() %>(<%= constructor.getParamsForDeclaration() %>) {
+        super(<%= constructor.getParamsForCall() %>);
+    }
+<%
+			} 
+		} 
+	} 
+%>
