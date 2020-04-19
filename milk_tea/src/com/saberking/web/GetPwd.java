@@ -21,7 +21,6 @@ public class GetPwd extends HttpServlet {
 	
 	public GetPwd() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)

@@ -45,7 +45,6 @@ public class Singleton {
 		try {
 			session.getBasicRemote().sendText(msg);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

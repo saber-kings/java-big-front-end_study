@@ -11,8 +11,8 @@ import org.apache.commons.beanutils.BeanUtils;
 public class RequestToBean {
 
 	/**
-	 * ConvertUtilsBean convertUtils = new ConvertUtilsBean(); DateConverter
-	 * dateConverter = new DateConverter();
+	 * ConvertUtilsBean convertUtils = new ConvertUtilsBean();
+	 * DateConverter dateConverter = new DateConverter();
 	 * convertUtils.register(dateConverter,Date.class);
 	 */
 
@@ -44,10 +44,8 @@ public class RequestToBean {
 		try {
 			BeanUtils.populate(beanObj, request.getParameterMap());
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return beanObj;
