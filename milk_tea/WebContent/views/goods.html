@@ -9,7 +9,6 @@
 		<link href="../css/animate.min.css" rel="stylesheet" />
 		<script src="../js/vue.min.js"></script>
 		<script src="../js/axios.min.js"></script>
-		<script src="../js/mui.min.js"></script>
 		<style>
 			.t123 {
 				position: absolute;
@@ -251,7 +250,7 @@
 								</div>
 							</div>
 							<div class="vl vl-btn">
-								<div class="btn btn-success btn-sm" v-show="showAddBtn" @click="submitAddMui();">提交</div>
+								<div class="btn btn-success btn-sm" v-show="showAddBtn" @click="submitAdd();">提交</div>
 								<div class="btn btn-default btn-sm" style="float: right;" @click="closeAdd();">取消</div>
 							</div>
 						</div>
@@ -369,8 +368,7 @@
 								<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 								<span>编辑</span>
 							</a>
-							<a class="btn btn-danger btn-xs" style="margin-left: 10px;" v- href="javascript:void(0);" @click="del(g.id);"
-							 v-model="g.id">
+							<a class="btn btn-danger btn-xs" style="margin-left: 10px;" v- href="javascript:void(0);" @click="del(index);">
 								<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
 								<span>删除</span>
 							</a>
@@ -394,12 +392,7 @@
 						gStuff: "",
 						gDesc: "暂无"
 					},
-					editG: {
-						gName: "",
-						gPrice: 0,
-						gStuff: "",
-						gDesc: "暂无"
-					},
+					editG: {},
 					goods: [],
 					showMask: false,
 					showAdd: false,
@@ -540,39 +533,6 @@
 								});
 						}
 					},
-					submitAddMui: function() {
-						if (isNaN(this.addG.gPrice)) {
-							// alert("价格必须是数值类型");
-							this.propError("价格必须是数值类型");
-						} else {
-							mui.ajax("../putGood", {
-								data: app1.addG,
-								dataType: 'json', //服务器返回json格式数据
-								type: 'post', //HTTP请求类型
-								timeout: 10000, //超时时间设置为10秒；
-								success: function(data) {
-									if (data.msg == "success") {
-										axios.get("../getGoods")
-											.then((res) => {
-												app1.goods = res.data;
-												app1.closeAdd();
-												this.propInfo("添加成功");
-											})
-											.catch((error) => {
-												console.log(error); //异常
-											});
-									} else {
-										app1.propError("添加失败");
-									}
-								},
-								error: function(xhr, type, errorThrown) {
-									//异常处理；
-									// alert(type);
-									app1.propError(type);
-								}
-							});
-						}
-					},
 					submitEdit: function() {
 						if (isNaN(this.editG.gPrice)) {
 							this.propError("价格必须是数值类型");
@@ -585,15 +545,17 @@
 								.then((res) => {
 									var r1 = res.data;
 									if (r1.msg == "success") {
-										axios.get("../getGoods")
-											.then((res) => {
-												this.goods = res.data;
+										// let item = this.goods.map(item => item.id).indexOf(this.editG.id);
+										
+										// axios.get("../getGoods")
+										// 	.then((res) => {
+										// 		this.goods = res.data;
 												this.closeEdit();
 												this.propInfo("修改成功");
-											})
-											.catch((error) => {
-												console.log(error); //异常
-											});
+											// })
+											// .catch((error) => {
+											// 	console.log(error); //异常
+											// });
 									} else {
 										this.propError("修改失败");
 									}
@@ -603,19 +565,20 @@
 								});
 						}
 					},
-					del: function(id) {
-						axios.get("../delGood?uid=" + id)
+					del: function(index) {
+						axios.get("../delGood?uid=" + this.goods[index].id)
 							.then((res) => {
 								var r1 = res.data;
 								if (r1.msg == "success") {
-									axios.get("../getGoods")
-										.then((res) => {
-											this.goods = res.data;
-											this.propInfo("删除成功");
-										})
-										.catch((error) => {
-											console.log(error); //异常
-										});
+									this.propInfo("删除成功");
+									// axios.get("../getGoods")
+									// 	.then((res) => {
+									// 		this.goods = res.data;
+									// 	})
+									// 	.catch((error) => {
+									// 		console.log(error); //异常
+									// 	});
+									this.goods.splice(index, 1);
 								} else {
 									document.getElementsByClassName("info")[0].style.color = "red";
 									this.propInfo("删除失败");

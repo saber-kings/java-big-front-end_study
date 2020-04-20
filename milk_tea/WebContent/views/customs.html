@@ -364,8 +364,7 @@
 								<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
 								<span>编辑</span>
 							</a>
-							<a class="btn btn-danger btn-xs" style="margin-left: 10px;" v- href="javascript:void(0);" @click="del(c.id);"
-							 v-model="c.id">
+							<a class="btn btn-danger btn-xs" style="margin-left: 10px;" v- href="javascript:void(0);" @click="del(index);">
 								<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
 								<span>删除</span>
 							</a>
@@ -540,7 +539,7 @@
 								.then((res) => {
 									var r1 = res.data;
 									if (r1.msg == "success") {
-										this.search();
+										// this.search();
 										this.closeEdit();
 										this.propInfo("修改成功");
 									} else {
@@ -552,13 +551,14 @@
 								});
 						}
 					},
-					del: function(id) {
-						axios.get("../delCustom?cid=" + id)
+					del: function(index) {
+						axios.get("../delCustom?cid=" + this.customs[index].id)
 							.then((res) => {
 								var r1 = res.data;
 								if (r1.msg == "success") {
-									this.search();
+									// this.search();
 									this.propInfo("删除成功");
+									this.customs.splice(index, 1);
 								} else {
 									document.getElementsByClassName("info")[0].style.color = "red";
 									this.propInfo("删除失败");
