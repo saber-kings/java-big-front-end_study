@@ -1,5 +1,6 @@
 package com.saberking.utils;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,6 +15,7 @@ import org.apache.commons.dbutils.GenerousBeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.RowProcessor;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 
 public class DH {
 
@@ -79,6 +81,25 @@ public class DH {
 
 			DbUtils.closeQuietly(conn);
 
+		}
+		return num;
+	}
+
+	public static BigInteger insert(String sql, Object... params) {
+		BigInteger num = new BigInteger("0");
+		Connection conn = null;
+		DbUtils.loadDriver(DH.connstr);
+		try {
+			conn = DriverManager.getConnection(DH.dr, DH.uid, DH.pwd);
+			QueryRunner qr = new QueryRunner();
+			num = qr.insert(conn, sql, new ScalarHandler<BigInteger>(),  params);
+			// System.out.println(num);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			
+			DbUtils.closeQuietly(conn);
+			
 		}
 		return num;
 	}

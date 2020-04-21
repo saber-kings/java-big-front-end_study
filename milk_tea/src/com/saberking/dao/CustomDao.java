@@ -15,13 +15,15 @@ public class CustomDao {
 		return DH.getall(sql, Custom.class, (Object[]) null);
 	}
 
-	public Boolean save(Custom custom) {
+	public long save(Custom custom) {
 		String sql = "insert into t_custom(cname,created,updated,phone,email) values(?,?,?,?,?)";
-		int num = DH.update(sql, custom.getCname(), custom.getCreated(), custom.getUpdated(), custom.getPhone(), custom.getEmail());
-		if (num > 0) {
-			return true;
+		long num = DH.insert(sql, custom.getCname(), custom.getCreated(), custom.getUpdated(), custom.getPhone(),
+				custom.getEmail()).longValue();
+		System.out.println(num);
+		if (num > 0L) {
+			return num;
 		} else {
-			return false;
+			return 0L;
 		}
 	}
 
@@ -53,7 +55,7 @@ public class CustomDao {
 			sql = sql + " and email = ?";
 			params.add(custom.getEmail().trim());
 		}
-		if (params.size()!=0) {
+		if (params.size() != 0) {
 			for (Object param : params) {
 				result = DH.getall(sql, Custom.class, param);
 			}
@@ -65,7 +67,8 @@ public class CustomDao {
 
 	public Boolean update(Custom custom) {
 		String sql = "update t_custom set cname=?,updated=?,phone=?,email=? where id=?";
-		int num = DH.update(sql, custom.getCname(), custom.getUpdated(), custom.getPhone(), custom.getEmail(), custom.getId());
+		int num = DH.update(sql, custom.getCname(), custom.getUpdated(), custom.getPhone(), custom.getEmail(),
+				custom.getId());
 		if (num > 0) {
 			return true;
 		} else {

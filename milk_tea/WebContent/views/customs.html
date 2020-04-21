@@ -383,6 +383,7 @@
 						email: ""
 					},
 					addC: {
+						id: null,
 						cname: "",
 						phone: "",
 						email: ""
@@ -434,6 +435,7 @@
 						this.showMask = false;
 					},
 					openAdd: function() {
+						this.addC.id = null;
 						this.addC.cname = "";
 						this.addC.phone = "";
 						this.addC.email = "";
@@ -513,6 +515,10 @@
 								.then((res) => {
 									var r1 = res.data;
 									if (r1.msg == "success") {
+										// let maxId = Math.max.apply(Math,this.customs.map(item => { return item.id }));
+										// this.addC.id = maxId+1;
+										this.addC.id = r1.id;
+										this.customs.push(this.addC);
 										this.search();
 										this.closeAdd();
 										this.propInfo("添加成功");
@@ -575,7 +581,7 @@
 				filters: {
 					/*日期处理*/
 					dateFormat(date) {
-						return moment(date).format("YYYY-MM-DD");
+						return moment(date).format("YYYY-MM-DD HH:mm");
 					},
 				}
 			});
