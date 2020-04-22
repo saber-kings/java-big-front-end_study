@@ -19,10 +19,11 @@ public class CustomService {
 	public String add(Custom custom) {
 		custom.setCreated(new Date());
 		custom.setUpdated(new Date());
-		long res = customDao.save(custom);
+		Long res = customDao.save(custom);
 		if (res != 0L) {
+			custom.setId(res.intValue());
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("id", res);
+			map.put("addC", custom);
 			map.put("msg", "success");
 			return JSON.toJSON(map).toString();
 		} else {

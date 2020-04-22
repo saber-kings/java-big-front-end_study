@@ -517,11 +517,14 @@
 									if (r1.msg == "success") {
 										// let maxId = Math.max.apply(Math,this.customs.map(item => { return item.id }));
 										// this.addC.id = maxId+1;
-										this.addC.id = r1.id;
-										this.customs.push(this.addC);
-										this.search();
+										this.addC = r1.addC;
 										this.closeAdd();
-										this.propInfo("添加成功");
+										setTimeout(function() {
+											app1.propInfo("添加成功");
+											// app1.customs.push(app1.addC);
+										}, 850);
+										app1.customs.push(app1.addC);
+										// this.search();
 									} else {
 										this.propError("添加失败");
 									}
@@ -547,7 +550,9 @@
 									if (r1.msg == "success") {
 										// this.search();
 										this.closeEdit();
-										this.propInfo("修改成功");
+										setTimeout(function() {
+											app1.propInfo("修改成功");
+										}, 850);
 									} else {
 										this.propError("修改失败");
 									}
@@ -581,7 +586,7 @@
 				filters: {
 					/*日期处理*/
 					dateFormat(date) {
-						return moment(date).format("YYYY-MM-DD HH:mm");
+						return moment(date).format("YYYY-MM-DD HH:mm:ss");
 					},
 				}
 			});

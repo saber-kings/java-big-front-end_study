@@ -19,7 +19,7 @@ public class CustomDao {
 		String sql = "insert into t_custom(cname,created,updated,phone,email) values(?,?,?,?,?)";
 		long num = DH.insert(sql, custom.getCname(), custom.getCreated(), custom.getUpdated(), custom.getPhone(),
 				custom.getEmail()).longValue();
-		System.out.println(num);
+//		System.out.println(num);
 		if (num > 0L) {
 			return num;
 		} else {
