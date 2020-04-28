@@ -16,6 +16,7 @@ public class Good implements Serializable {
 	private int gPrice;
 	private String gStuff;
 	private String gDesc;
+	private String img;
 
 //	public String getgName() {
 //		return gName;
