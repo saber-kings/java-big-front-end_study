@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/mui.indexedlist.css" rel="stylesheet" />
+		<style>
+			html,
+			body {
+				height: 100%;
+				overflow: hidden;
+				
+			}
+			.mui-bar {
+				-webkit-box-shadow: none;
+				box-shadow: none;
+			}
+			.my-border-radius-8 {
+				border-radius: 8px;
+			}
+			.mui-table-view-divider:before {
+			    background-color: transparent;
+			}
+			.mui-table-view-divider:after {
+			    background-color: transparent;
+			}
+		</style>
+		<script src="js/mui.min.js"></script>
+		<script src="js/mui.indexedlist.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			mui.ready(function() {
+				var header = document.querySelector('header.mui-bar');
+				// var headMenu = document.querySelector('div.head-menu-list');
+				var list = document.getElementById('list');
+				//calc hieght
+				list.style.height = (document.body.offsetHeight - header.offsetHeight) + 'px';
+				//create
+				window.indexedList = new mui.IndexedList(list);
+			});
+		</script>
+	</head>
+	<body>
+		<!-- 头部 -->
+		<header class="mui-bar mui-bar-nav">
+			<!-- <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a> -->
+			<h1 class="mui-title">通信录</h1>
+		</header>
+		<!-- 主体导航 -->
+		<div class="mui-content">
+			<div id="list" class="mui-indexed-list">
+				<!-- 搜索栏 -->
+				<div class="mui-indexed-list-search mui-input-row mui-search" style="display: none;">
+					<input type="search" class="mui-input-clear mui-indexed-list-search-input" placeholder="搜索">
+				</div>
+				<!-- 头部菜单栏 -->
+				<!-- 右侧字母导航栏 -->
+				<div class="mui-indexed-list-bar" style="background-color: transparent;">
+					<a>A</a>
+					<a>B</a>
+					<a>C</a>
+					<a>D</a>
+					<a>E</a>
+					<a>F</a>
+					<a>G</a>
+					<a>H</a>
+					<a>I</a>
+					<a>J</a>
+					<a>K</a>
+					<a>L</a>
+					<a>M</a>
+					<a>N</a>
+					<a>O</a>
+					<a>P</a>
+					<a>Q</a>
+					<a>R</a>
+					<a>S</a>
+					<a>T</a>
+					<a>U</a>
+					<a>V</a>
+					<a>W</a>
+					<a>X</a>
+					<a>Y</a>
+					<a>Z</a>
+				</div>
+				<div class="mui-indexed-list-alert"></div>
+				<!-- 好友列表 -->
+				<div class="mui-indexed-list-inner">
+					<div class="mui-indexed-list-empty-alert">没有数据</div>
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell mui-media">
+							<a href="javascript:void(0);">
+								<img class="mui-media-object mui-pull-left my-border-radius-8" src="img/tjhy.png">
+								<div class="mui-media-body mui-content-padded">
+									新的朋友
+									<!-- <p class="mui-ellipsis">烤炉模式的城，到黄昏，如同打翻的调色盘一般.</p> -->
+								</div>
+							</a>
+						</li>
+						<li class="mui-table-view-cell mui-media">
+							<a href="javascript:void(0);">
+								<img class="mui-media-object mui-pull-left my-border-radius-8" src="img/ql.png">
+								<div class="mui-media-body mui-content-padded">
+									群聊
+									<!-- <p class="mui-ellipsis">烤炉模式的城，到黄昏，如同打翻的调色盘一般.</p> -->
+								</div>
+							</a>
+						</li>
+						<li data-group="A" class="mui-table-view-divider mui-indexed-list-group">A</li>
+						<li data-group="B" class="mui-table-view-divider mui-indexed-list-group">B</li>
+						<li data-group="C" class="mui-table-view-divider mui-indexed-list-group">C</li>
+						<li data-value="CBD" data-tags="CBD" class="mui-table-view-cell mui-media mui-indexed-list-item">
+							<a href="javascript:void(0);">
+								<img class="mui-media-object mui-pull-left my-border-radius-8" src="img/group.png">
+								<div class="mui-media-body mui-content-padded">
+									CBD
+									<!-- <p class="mui-ellipsis">烤炉模式的城，到黄昏，如同打翻的调色盘一般.</p> -->
+								</div>
+							</a>
+						</li>
+						<li data-group="D" class="mui-table-view-divider mui-indexed-list-group">D</li>
+						<li data-group="E" class="mui-table-view-divider mui-indexed-list-group">E</li>
+						<li data-group="F" class="mui-table-view-divider mui-indexed-list-group">F</li>
+						<li data-group="G" class="mui-table-view-divider mui-indexed-list-group">G</li>
+						<li data-group="H" class="mui-table-view-divider mui-indexed-list-group">H</li>
+						<li data-group="J" class="mui-table-view-divider mui-indexed-list-group">J</li>
+						<li data-group="K" class="mui-table-view-divider mui-indexed-list-group">K</li>
+						<li data-group="L" class="mui-table-view-divider mui-indexed-list-group">L</li>
+						<li data-group="M" class="mui-table-view-divider mui-indexed-list-group">M</li>
+						<li data-value="MW" data-tags="MuWu" class="mui-table-view-cell mui-media mui-indexed-list-item">
+							<a href="javascript:void(0);">
+								<img class="mui-media-object mui-pull-left my-border-radius-8" src="img/group.png">
+								<div class="mui-media-body mui-content-padded">
+									木屋
+									<!-- <p class="mui-ellipsis">想要这样一间小木屋，夏天挫冰吃瓜，冬天围炉取暖.</p> -->
+								</div>
+							</a>
+						</li>
+						<li data-group="N" class="mui-table-view-divider mui-indexed-list-group">N</li>
+						<li data-group="P" class="mui-table-view-divider mui-indexed-list-group">P</li>
+						<li data-group="Q" class="mui-table-view-divider mui-indexed-list-group">Q</li>
+						<li data-group="R" class="mui-table-view-divider mui-indexed-list-group">R</li>
+						<li data-group="S" class="mui-table-view-divider mui-indexed-list-group">S</li>
+						<li data-group="T" class="mui-table-view-divider mui-indexed-list-group">T</li>
+						<li data-group="W" class="mui-table-view-divider mui-indexed-list-group">W</li>
+						<li data-group="X" class="mui-table-view-divider mui-indexed-list-group">X</li>
+						<li data-value="XF" data-tags="XingFu" class="mui-table-view-cell mui-media mui-indexed-list-item">
+							<a href="javascript:void(0);">
+								<img class="mui-media-object mui-pull-left my-border-radius-8" src="img/group.png">
+								<div class="mui-media-body mui-content-padded" style="">
+									幸福
+									<!-- <p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p> -->
+								</div>
+							</a>
+						</li>
+						<li data-value="XF" data-tags="XingFu" class="mui-table-view-cell mui-media mui-indexed-list-item">
+							<a href="javascript:void(0);">
+								<img class="mui-media-object mui-pull-left my-border-radius-8" src="img/group.png">
+								<div class="mui-media-body mui-content-padded" style="">
+									幸福
+									<!-- <p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p> -->
+								</div>
+							</a>
+						</li>
+						<li data-value="XF" data-tags="XingFu" class="mui-table-view-cell mui-media mui-indexed-list-item">
+							<a href="javascript:void(0);">
+								<img class="mui-media-object mui-pull-left my-border-radius-8" src="img/group.png">
+								<div class="mui-media-body mui-content-padded" style="">
+									幸福
+									<!-- <p class="mui-ellipsis">能和心爱的人一起睡觉，是件幸福的事情；可是，打呼噜怎么办？</p> -->
+								</div>
+							</a>
+						</li>
+						<li data-group="Y" class="mui-table-view-divider mui-indexed-list-group">Y</li>
+						<li data-group="Z" class="mui-table-view-divider mui-indexed-list-group">Z</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

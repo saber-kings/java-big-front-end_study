@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/icons-extra.css" rel="stylesheet" />
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init({
+				subpages: [{
+						url: 'tabbar_home.html', //根据自己的目录修改
+						id: 'tabbar_home.html', //随意
+						styles: {
+							top: '0px',
+							bottom: '50px'
+
+						}
+					},
+					{
+						url: 'tabbar_cart.html', //根据自己的目录修改
+						id: 'tabbar_cart.html', //随意
+						styles: {
+							top: '0px',
+							bottom: '50px'
+
+						}
+					},
+					{
+						url: 'tabbar_person.html', //根据自己的目录修改
+						id: 'tabbar_person.html', //随意
+						styles: {
+							top: '0px',
+							bottom: '50px'
+
+						}
+					}
+				]
+			});
+			mui.plusReady(function() {
+				plus.navigator.setStatusBarStyle('dark');
+				plus.navigator.setStatusBarBackground('#f7f7f7');
+				plus.webview.hide("tabbar_person.html");
+				plus.webview.hide("tabbar_cart.html");
+			});
+		</script>
+		<script>
+			var previous = "tabbar_home.html";
+
+			function addCurrentPage(index) {
+				mui.plusReady(function() {
+					plus.webview.hide(previous);// 隐藏上一个子页面
+					plus.webview.show(index); // 显示当前点击页面
+				});
+				previous = index;
+			}
+		</script>
+	</head>
+	<body onload="addCurrentPage('tabbar_home.html');">
+		<!-- 底部导航 -->
+		<nav class="mui-bar mui-bar-tab" style="z-index: 999;">
+			<a class="mui-tab-item mui-active" href="javascript:void(0);" onclick="addCurrentPage('tabbar_home.html');">
+				<span class="mui-icon mui-icon-home"></span>
+				<span class="mui-tab-label">首页</span>
+			</a>
+			<a class="mui-tab-item" href="javascript:void(0);" onclick="addCurrentPage('tabbar_cart.html');">
+				<span class="mui-icon mui-icon-extra mui-icon-extra-cart"></span>
+				<span class="mui-tab-label">购物车</span>
+			</a>
+			<a class="mui-tab-item" href="javascript:void(0);" onclick="addCurrentPage('tabbar_person.html');">
+				<span class="mui-icon mui-icon-person"></span>
+				<span class="mui-tab-label">我的</span>
+			</a>
+		</nav>
+	</body>
+</html>

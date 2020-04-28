@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/icons-extra.css" rel="stylesheet" />
+		<!-- <link href="css/app.css" rel="stylesheet" /> -->
+		<link rel="stylesheet" type="text/css" href="https://at.alicdn.com/t/font_1773518_bt14i9992hw.css" />
+		<style>
+			html,
+			body {
+				height: 100%;
+				overflow: hidden;
+			}
+			.mui-bar {
+				-webkit-box-shadow: none;
+				box-shadow: none;
+			}
+			.mui-input-row.mui-search .mui-icon-speech {
+				top: 0 !important;
+			}
+			.mui-input-row.mui-search .mui-icon-clear {
+			    top: 0 !important;
+			}
+			.mui-input-row .mui-input-clear~.mui-icon-clear, .mui-input-row .mui-input-password~.mui-icon-eye, .mui-input-row .mui-input-speech~.mui-icon-speech {
+			    width: 40px !important;
+			    height: 34px !important;
+				line-height: 32px !important;
+			}
+			.mui-search:before {
+			    top: 0 !important;
+				margin: 7px 0 !important;
+				padding: 0 5px !important;
+			}
+			.mui-icon-search:before {
+			    right: 50% !important;
+			}
+			.mui-search input[type=search] {
+			    padding-left: 35px !important;
+			}
+			.mui-search .mui-placeholder .mui-icon,.mui-icon-search {
+			    height: 34px !important;
+				line-height: 34px !important;
+			    width: 30px !important;
+				float: left !important;
+				padding-left: 10px !important;
+			}
+			#topPopover {
+				background-color: #4C4C4C;
+				color: white;
+				position: fixed;
+				top: 16px;
+				right: 6px;
+			}
+			#topPopover .mui-popover-arrow {
+				left: auto;
+				right: 6px;
+			}
+			#topPopover.mui-popover .mui-popover-arrow:after {
+				background-color: #4C4C4C;
+			}
+			#topPopover.mui-popover .mui-table-view {
+				background-color: #4C4C4C;
+			}
+			#topPopover.mui-popover .mui-table-view .mui-table-view-cell:after {
+				background-color: rgba(0,0,0,.15);
+			}
+			.mui-popover {
+				width: 150px;
+				height: 186px;
+			}
+			.mui-backdrop {
+				background-color: transparent;
+			}
+			[v-cloak] { display: none }
+		</style>
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init()
+		</script>
+		<script src="js/vue.min.js"></script>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<!-- <a class="mui-icon mui-icon-left-nav mui-pull-left"></a> -->
+			<a id="menu" class="mui-action-menu mui-icon mui-icon-right-nav mui-pull-right mui-icon-plus" style="" href="#topPopover"></a>
+			<h1 class="mui-title">同&emsp;好</h1>
+		</header>
+		<div id="content" class="mui-content">
+			<div class="mui-input-row mui-search" style="width: 90%;margin: 10px auto;border-radius: 20px;background-color: white;">
+				<input type="search" class="mui-input-speech mui-input-clear" placeholder="搜索" style="width: 90%;margin: 0 auto;border-radius: 20px;background-color: white;">
+			</div>
+			<ul class="mui-table-view" v-cloak>
+				<li class="mui-table-view-cell mui-media" v-for="g in groups" @click="chat(g.id, g.gname);">
+					<a href="javascript:void(0);" @click="chat(g.id, g.gname);">
+						<img style="border-radius: 8px;" class="mui-media-object mui-pull-left" :src="g.gimg">
+						<div class="mui-media-body mui-pull-left" style="font-family: '微软雅黑';width: 60%;">
+							<strong>{{g.gname}}</strong>
+							<p class='mui-ellipsis'>{{g.gdesc}}</p>
+						</div>
+						<div class="mui-pull-right" style="width: 20%;height: 100%;font-size: x-small;color: #8f8f94;text-align: right;">
+							<div tyle="width: 100%;height: 50%;">
+								2020/4/22
+							</div>
+							<div tyle="width: 100%;height: 50%;">
+								<span class="mui-icon iconfont" v-show="g.muted==0">&#xe74d;</span>
+							</div>
+						</div>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<!--右上角弹出菜单-->
+		<div id="topPopover" class="mui-popover">
+			<div class="mui-popover-arrow"></div>
+			<div class="mui-scroll-wrapper">
+				<div class="mui-scroll">
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell">
+							<a href="#">
+								<span class="mui-icon-extra mui-icon-extra-comment" style="font-size: 10px;"></span>
+								&nbsp;&nbsp;发起群聊
+							</a>
+						</li>
+						<li class="mui-table-view-cell">
+							<a href="#">
+								<span class="mui-icon-extra mui-icon-extra-addpeople" style="font-size: 15px;margin-left: -1px;"></span>
+								&nbsp;&nbsp;添加朋友
+							</a>
+						</li>
+						<li class="mui-table-view-cell">
+							<a href="#">
+								<span class="mui-icon-extra mui-icon-extra-sweep" style="font-size: 14px;"></span>
+								&nbsp;&nbsp;扫一扫
+							</a>
+						</li>
+						<li class="mui-table-view-cell">
+							<a href="#">
+								<span class="mui-icon mui-icon-email-filled" style="font-size: 20px;margin-left: -2px;"></span>
+								&nbsp;帮助与反馈
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			mui('.mui-scroll-wrapper').scroll();
+			mui('body').on('shown', '.mui-popover', function(e) {
+				//console.log('shown', e.detail.id);//detail为当前popover元素
+			});
+			mui('body').on('hidden', '.mui-popover', function(e) {
+				//console.log('hidden', e.detail.id);//detail为当前popover元素
+			});
+			var app1 = new Vue({
+				el: "#content",
+				data: {
+					groups: []
+				},
+				created: function() {
+					var uid = window.localStorage.getItem("uid");
+					mui.ajax("http://192.168.31.139:9090/GroupChat/index.php?uid=" + uid, {
+						dataType: 'json', //服务器返回json格式数据
+						type: 'get', //HTTP请求类型
+						timeout: 10000, //超时时间设置为10秒；
+						success: function(data) {
+							app1.groups = data;
+							app1.groups.forEach(g => {
+								g.gimg = "http://192.168.31.139:9090/GroupChat/" + g.gimg;
+							});
+						},
+						error: function(xhr, type, errorThrown) {
+							//异常处理；
+							alert(type);
+						}
+					});
+				},
+				methods: {
+					chat: function(id, gname) {
+						var gid = window.localStorage.setItem("gid", id);
+						var gname = window.localStorage.setItem("gname", gname);
+						mui.openWindow("chat.html", "chat.html", {});
+						// mui.openWindow("chat.html");
+						// window.location.href="chat.html";
+					}
+				}
+			});
+		</script>
+	</body>
+</html>
