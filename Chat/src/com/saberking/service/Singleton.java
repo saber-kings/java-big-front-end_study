@@ -55,10 +55,16 @@ public class Singleton {
 
 	public synchronized void removeUser(String uid, String gid) {
 		Vector<UserOL> users = this.groups.get(gid);
-		users.forEach(u -> {
+		for (int i = 0; i < users.size(); i++) {
+			UserOL u = users.get(i);
 			if (u.getUserId().equals(uid)) {
-				users.remove(u);
+				users.remove(i);
 			}
-		});
+		}
+//		users.forEach(u -> {
+//			if (u.getUserId().equals(uid)) {
+//				users.remove(u);
+//			}
+//		});
 	}
 }
