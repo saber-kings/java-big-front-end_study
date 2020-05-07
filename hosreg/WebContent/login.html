@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>登录</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" media="screen" href="css/login.css">
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" href="css/animate.min.css" />
+		<style>
+			[v-cloak] { display: none }
+		</style>
+		<script src="js/vue.min.js"></script>
+		<script src="js/axios.min.js"></script>
+	</head>
+	<body>
+
+		<div id="particles-js">
+			<div id="base" class="login">
+				<transition leave-active-class="animated fadeOut" enter-active-class="animated fadeIn">
+					<div class="t123" v-show="showMask" v-cloak>
+						<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+							<div class="error" v-show="showError">
+								<div>"{{info}}"</div>
+							</div>
+						</transition>
+					</div>
+				</transition>
+				<div class="login-top">
+					登录
+				</div>
+				<div class="login-center clearfix">
+					<div class="login-center-img"><img src="images/name.png" /></div>
+					<div class="login-center-input">
+						<input type="text" placeholder="请输入您的用户名" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的用户名'" v-model="un" />
+						<div class="login-center-input-text">用户名</div>
+					</div>
+				</div>
+				<div class="login-center clearfix">
+					<div class="login-center-img"><img src="images/password.png" /></div>
+					<div class="login-center-input">
+						<input type="password" placeholder="请输入您的密码" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的密码'" v-model="up" />
+						<div class="login-center-input-text">密码</div>
+					</div>
+				</div>
+				<div class="login-center clearfix" style="padding: 0 60px;">
+					<div class="login-button" @click="submit();">
+						登录
+					</div>
+					<div class="reset-button" @click="reset();">
+						重置
+					</div>
+				</div>
+			</div>
+			<div class="sk-rotating-plane"></div>
+		</div>
+
+		<!-- scripts -->
+		<script src="js/particles.min.js"></script>
+		<script src="js/app.js"></script>
+		<script>
+			//对象字面量
+			var app1 = new Vue({
+				//提供一个在页面上已存在的 DOM 元素作为 Vue 实例的挂载目标。可以是 CSS 选择器，也可以是一个 HTMLElement 实例。
+				el: "#base",
+				//定义数据
+				data: {
+					un: "",
+					up: "",
+					showMask: false,
+					showError: false,
+					info: ""
+				},
+				//包含函数
+				methods: {
+					reset: function() {
+						this.un = "";
+						this.up = "";
+					},
+					openError: function(msg) {
+						this.info = msg;
+						this.showMask = true;
+						this.showError = true;
+					},
+					closeError: function() {
+						this.showError = false;
+						this.showMask = false;
+					},
+					propError: function(msg) {
+						this.openError(msg);
+						setTimeout(function() {
+							app1.closeError();
+						}, 2000);
+					},
+					submit: function() {
+						if (this.un == "") {
+							this.propError("请输入账号");
+						} else if (this.up == "") {
+							this.propError("请输入密码");
+						} else {
+							axios.get("login?un=" + this.un + "&up=" + this.up)
+								.then((res) => {
+									var r1 = res.data;
+									// alert(r1);
+									if (r1.msg == "error") {
+										this.propError("登陆失败");
+									}else if(r1.msg == "logined"){
+										this.propError("用户已登录");
+									} else {
+										window.localStorage.setItem("uid", r1.id);
+										window.localStorage.setItem("realName", r1.realName);
+										window.location.href = "index.html";
+									}
+								})
+								.catch((error) => {
+									console.log(error); //异常
+								});
+						}
+					}
+				},
+				//相当于onload，加载完DOM树后执行
+				created: function() {
+			
+				},
+				//运算函数
+				computed: {
+			
+				},
+				//监听器
+				watch: {
+			
+				}
+			});
+		</script>
+	</body>
+</html>

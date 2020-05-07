@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>挂号管理</title>
+		<link href="../css/tail.css" rel="stylesheet" type="text/css" />
+		<link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+		<style>
+			[v-cloak] {
+				display: none
+			}
+		</style>
+	</head>
+	<body style="border-radius: 8px">
+		<!--<div class="title"><h2>通知详情</h2></div>-->
+		<div class="top" id="app">
+			<div>
+				<div class="top_out">
+					<table class="table" v-cloak>
+						<tbody>
+							<tr>
+								<td style="border-top: none">姓名：</td>
+								<td colspan="6" style="text-align: left;border-top: none">
+									<input type="text" required v-model="patient.pname">
+									年龄<input type="text" minlength="1" required v-model="patient.age">
+									性别<select v-model="patient.sex">
+										<option value="男">男</option>
+										<option value="女">女</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>挂号科室：</td>
+								<td colspan="6">科室：<select style="width: 40%" id="part" v-model="patient.sid">
+										<option value="0">选择部门</option>
+										<option v-for="s in sections" v-bind:value="s.id">
+											{{s.sname}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;地址：{{s.address}}
+										</option>
+									</select> 挂号类别：
+									<select style="width: 40%" id="person" v-model="patient.ptype">
+										<option value="p">普通号</option>
+										<option value="z">专家号</option>
+									</select></td>
+							</tr>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="bot_btn">
+				<input class="btn" type="button" value="挂号" @click="order();" />
+				<button class="btn btn1">重填</button>
+			</div>
+		</div>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/axios.min.js"></script>
+		<script>
+			var app = new Vue({
+				el: "#app",
+				data: {
+					patient: {
+						pname: "",
+						age: 0,
+						sex: "男",
+						sid: "0",
+						ptype: ""
+					},
+					sections: []
+				},
+				created: function() {
+					axios.get("../getSections")
+						.then((res) => {
+							app.sections = res.data;
+						})
+						.catch((error) => {
+							console.log(error); //异常
+						});
+				},
+				methods: {
+					order: function() {
+						if (this.patient.pname == "") {
+							alert("请填写姓名");
+						} else if (isNaN(this.patient.age) || this.patient.age < 0 || this.patient.age > 160) {
+							alert("请输入正确年龄");
+						} else if (this.patient.sid == "0") {
+							alert("请选择科室");
+						} else {
+							axios.post("../orderNum", this.patient)
+								.then((res) => {
+									//app.sections=res.data;
+									alert(res.data.msg);
+									if (res.data.msg="success") {
+										window.localStorage.setItem("sid", this.patient.sid);
+										window.localStorage.setItem("ptype", this.patient.ptype);
+									}
+								})
+								.catch((error) => {
+									console.log(error); //异常
+								});
+						}
+					}
+				}
+			});
+		</script>
+
+	</body>
+
+
+</html>
