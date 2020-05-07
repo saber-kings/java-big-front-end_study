@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" href="../css/style.css">
+	</head>
+		
+		
+		                  
+	<body>
+		<div id="d2">
+			<button type="button" class="btn btn-primary mr-2" @click="da();">我要打卡</button>
+		</div>
+		<script>
+			var app1=new Vue({
+				el:"#d2",
+				data:{
+					
+				},
+				created: function() {
+					
+				},
+				methods:{
+					da:function(){
+						var uid=window.localStorage.getItem("uid");
+						var realname=window.localStorage.getItem("realname");
+						axios.get("../daka?uid="+uid+"&realname="+realname)
+						  .then((res) => {
+							  alert("打卡成功");
+							//console.log(response.data);//请求的返回体
+						  })
+						  .catch((error) => {
+							console.log(error);//异常
+						  });
+					}
+				}
+			});
+		</script>
+	</body>
+</html>

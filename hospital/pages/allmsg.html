@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Spica Admin</title>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- endinject -->
+  <script src="../js/vue.js"></script>
+  <script src="../js/axios.min.js"></script>
+</head>
+
+<body>
+  <div class="container-scroller d-flex">
+    <!-- partial:../../partials/_sidebar.html -->
+    
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row" id="sv1">
+            
+            <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">通知</h4>
+                  
+                  
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>
+                            编号
+                          </th>
+                          <th>
+                            标题
+                          </th>
+                          <th>
+                            内容
+                          </th>
+                          
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(d,index) in ds" style="cursor:pointer;" @click="st(index);" >
+                          <td>
+                            {{index+1}}
+                          </td>
+                          <td>
+                            {{d.mname}}
+                          </td>
+                          
+                          <td>
+                            {{d.mcontext}}
+                          </td>
+                        </tr>
+                        
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+			  
+            </div>
+			
+			
+			
+			
+			
+            <div class="col-12 grid-margin stretch-card" v-show="show1">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">详细信息</h4>
+                  
+                  
+                    <div class="form-group">
+                      <label for="exampleInputName1">标题</label>
+                     {{d1.mname}}
+                    </div>
+                    
+                    
+                    <div class="form-group">
+                      <label for="exampleTextarea1">内容</label>
+                      {{d1.mcontext}}
+                    </div>
+                     <button class="btn btn-light" @click="st1();">关闭</button>
+                  
+                </div>
+              </div>
+            </div>
+			
+			
+			
+			
+          </div>
+		  
+		  <script>
+		  	var app1=new Vue({
+		  		el:"#sv1",
+		  		data:{
+		  			s1:"未审核",
+		  			ds:[],
+					d1:{},
+					show1:false,
+					show3:false,
+					ff:{
+						mname:"",
+						mcontext:""
+						
+					}
+					
+		  		},
+		  		created: function() {
+		  			
+		  			this.aaa();
+		  			
+		  		},
+		  		methods:{
+		  			aaa:function(){
+		  				var uid=window.localStorage.getItem("uid");
+		  				
+		  				
+		  				axios.get("../allmsg")
+		  				  .then((res) => {
+		  					  app1.ds=res.data;
+		  					//console.log(response.data);//请求的返回体
+		  				  })
+		  				  .catch((error) => {
+		  					console.log(error);//异常
+		  				  });
+		  			},
+		  			st:function(ind){
+		  				this.d1=this.ds[ind];
+						this.show1=true;
+						
+		  			},
+					st1:function(){
+						this.show1=false;
+					},
+					st3:function(){
+						this.show3=true;
+					},
+					st4:function(){
+						this.show3=false;
+					},
+					tg:function(){
+						
+						axios.post("../addmsg",this.ff)
+						  .then((res) => {
+							  //alert("添加成功");
+							  this.st4();
+							  this.st1();
+							  this.aaa();
+							//console.log(response.data);//请求的返回体
+						  })
+						  .catch((error) => {
+							console.log(error);//异常
+						  });
+						//addshenqing
+					}
+		  		}
+		  	});
+		  </script>
+		  
+		  
+        </div>
+        <!-- content-wrapper ends -->
+        
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  
+</body>
+
+</html>

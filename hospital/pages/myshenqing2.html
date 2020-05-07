@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Spica Admin</title>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- endinject -->
+  <script src="../js/vue.js"></script>
+  <script src="../js/axios.min.js"></script>
+</head>
+
+<body>
+  <div class="container-scroller d-flex">
+    <!-- partial:../../partials/_sidebar.html -->
+    
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row" id="sv1">
+            
+            <div class="col-lg-12 stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">我的申请</h4>
+                  <p class="card-description">
+                     <select v-model="s1" @change="aaa();">
+						 <option value="未审核">未审核</option>
+						 <option value="已审核">已审核</option>
+						 <option value="审核未通过">审核未通过</option>
+						 
+					 </select>
+                  </p>
+                  <div class="table-responsive pt-3">
+					  <button type="button" class="btn btn-success mr-2" @click="st3();">+添加</button>
+					  
+                   
+                      <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>
+                            编号
+                          </th>
+                          <th>
+                            标题
+                          </th>
+                          <th>
+                            申请人
+                          </th>
+                          <th>
+                            状态
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(d,index) in ds" style="cursor:pointer;" @click="st(index);" >
+                          <td>
+                            {{index}}
+                          </td>
+                          <td>
+                            {{d.sname}}
+                          </td>
+                          <td>
+                            {{d.realname}}
+                          </td>
+                          <td>
+                            {{d.zt}}
+                          </td>
+                        </tr>
+                        
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+			  
+            </div>
+			
+			
+			
+			
+			
+            <div class="col-12 grid-margin stretch-card" v-show="show1">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">详细信息</h4>
+                  
+                  
+                    <div class="form-group">
+                      <label for="exampleInputName1">标题</label>
+                     {{d1.sname}}
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail3">申请人</label>
+                      {{d1.realname}}
+                    </div>
+                    
+                    
+                    
+                    <div class="form-group">
+                      <label for="exampleTextarea1">内容</label>
+                      {{d1.scontext}}
+                    </div>
+                     <button class="btn btn-light" @click="st1();">关闭</button>
+                  
+                </div>
+              </div>
+            </div>
+			
+			<div class="col-12 grid-margin stretch-card" v-show="show3">
+			  <div class="card">
+			    <div class="card-body">
+			      <h4 class="card-title">添加申请</h4>
+			      
+			      
+			        <div class="form-group">
+			          <label for="exampleInputName1">标题</label>
+			         <input type="text" class="form-control" id="exampleInputCity1" v-model="ff.sname">
+			        </div>
+			       
+			        
+			        
+			        <div class="form-group">
+			          <label for="exampleTextarea1">内容</label>
+			          <textarea class="form-control" id="exampleTextarea1" rows="4" v-model="ff.scontext"></textarea>
+			        </div>
+			        <button type="button" class="btn btn-primary mr-2" @click="tg();">提交</button>
+			        <button class="btn btn-light" @click="st4();">取消</button>
+			                          
+			      
+			    </div>
+			  </div>
+			</div>
+			
+			
+			
+          </div>
+		  
+		  <script>
+		  	var app1=new Vue({
+		  		el:"#sv1",
+		  		data:{
+		  			s1:"未审核",
+		  			ds:[],
+					d1:{},
+					show1:false,
+					show3:false,
+					ff:{
+						uid:0,
+						sname:"",
+						scontext:"",
+						realname:""
+					}
+					
+		  		},
+		  		created: function() {
+		  			this.ff.uid=window.localStorage.getItem("uid");
+					this.ff.realname=window.localStorage.getItem("realname");
+		  			this.aaa();
+		  			
+		  		},
+		  		methods:{
+		  			aaa:function(){
+		  				var uid=window.localStorage.getItem("uid");
+		  				
+		  				
+		  				axios.get("../myyewushenqing?uid="+uid+"&zt="+this.s1)
+		  				  .then((res) => {
+		  					  app1.ds=res.data;
+		  					//console.log(response.data);//请求的返回体
+		  				  })
+		  				  .catch((error) => {
+		  					console.log(error);//异常
+		  				  });
+		  			},
+		  			st:function(ind){
+		  				this.d1=this.ds[ind];
+						this.show1=true;
+						
+		  			},
+					st1:function(){
+						this.show1=false;
+					},
+					st3:function(){
+						this.show3=true;
+					},
+					st4:function(){
+						this.show3=false;
+					},
+					tg:function(){
+						
+						axios.post("../addshenqing",this.ff)
+						  .then((res) => {
+							  alert("添加成功");
+							  this.st4();
+							  this.st1();
+							  this.aaa();
+							//console.log(response.data);//请求的返回体
+						  })
+						  .catch((error) => {
+							console.log(error);//异常
+						  });
+						//addshenqing
+					}
+		  		}
+		  	});
+		  </script>
+		  
+		  
+        </div>
+        <!-- content-wrapper ends -->
+        
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  
+</body>
+
+</html>

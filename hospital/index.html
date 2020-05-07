@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title></title>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="images/favicon.png" />
+  <script src="js/vue.js"></script>
+  <script src="js/axios.min.js"></script>
+  <script>
+	  var w;
+	  var mv1;
+	  function gt(){
+		  mv1=document.getElementById("d34");
+		  var d=new Date();
+		  var str1=d.toLocaleDateString();
+		  
+		  document.getElementById("t1").innerHTML="当前日期："+str1;
+		  var uid=window.localStorage.getItem("uid");
+		  w=new WebSocket("ws://localhost:8080/oa/ssss/"+uid);
+		  w.onopen=function(){
+		  	  alert("链接");
+		  }
+		  w.onmessage=function(){
+			  mv();
+		  }
+	  }
+	  
+	  
+	  
+	  function mv(){
+		  var a1=parseInt(mv1.style.right);
+		  //alert(a1);
+		  
+		  if(a1<0){
+			  a1++;
+			  mv1.style.right=a1+"px";
+			  setTimeout("mv()",1);
+		  }
+	  }
+	  
+	  function cl(){
+		  
+		  mv1.style.right="-200px";
+		  document.getElementById("f1").src="pages/allmsg.html";
+	  }
+	  
+  </script>
+</head>
+<body onload="gt();" style="overflow: hidden;">
+	<div id="d34" style="width: 200px;height: 200px;position: absolute;right: -200px;bottom: 0px;">
+		<a href="javascript:void(0);" onclick="cl();">您有新的通知</a>
+	</div>
+  <div class="container-scroller d-flex" id="m1">
+    <!-- partial:./partials/_sidebar.html -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav">
+        <li class="nav-item sidebar-category">
+          <p>欢迎你：{{realname}}</p>
+          <span></span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0);" onclick="cl();">
+            <i class="mdi mdi-view-quilt menu-icon"></i>
+            <span class="menu-title">通知</span>
+            <!-- <div class="badge badge-info badge-pill">{{mnum}}</div> -->
+          </a>
+        </li>
+		
+        <li class="nav-item sidebar-category">
+          <p>我的工作</p>
+          <span></span>
+        </li>
+        
+        <li class="nav-item" v-for="m in menus">
+          <a class="nav-link" :href="m.murl" target="f1">
+            <i class="mdi mdi-view-headline menu-icon"></i>
+            <span class="menu-title">{{m.menutext}}</span>
+          </a>
+        </li>
+        
+      </ul>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:./partials/_navbar.html -->
+      <nav class="navbar col-lg-12 col-12 px-0 py-0 py-lg-4 d-flex flex-row">
+        <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+          
+          
+          <h4 class="font-weight-bold mb-0 d-none d-md-block mt-1">欢迎回来, {{realname}}</h4>
+          <ul class="navbar-nav navbar-nav-right">
+            <li class="nav-item">
+              <h4 class="mb-0 font-weight-bold d-none d-xl-block" id="t1"></h4>
+            </li>
+           
+            
+          </ul>
+          
+        </div>
+        
+      </nav>
+      <!-- partial -->
+      <div class="main-panel">
+        <iframe frameborder="0" id="f1" name="f1" style="width: 100%;height:100%;" src="welcome.html"></iframe>
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+<script>
+		var app1=new Vue({
+			el:"#m1",
+			data:{
+				realname:"",
+				uid:0,
+				menus:[],
+				mnum:0
+			},
+			created: function() {
+				
+				this.uid=window.localStorage.getItem("uid");
+				this.realname=window.localStorage.getItem("realname");
+				//alert(this.realname);
+				
+				axios.get("menubyuid?uid="+this.uid)
+				  .then((res) => {
+					  app1.menus=res.data;
+					//console.log(response.data);//请求的返回体
+				  })
+				  .catch((error) => {
+					console.log(error);//异常
+				  });
+				
+			},
+			methods:{
+				
+			}
+		});
+	</script>
+  
+</body>
+
+</html>

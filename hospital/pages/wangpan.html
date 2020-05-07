@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link href="../css/industry.css" rel="stylesheet"/>
+		<style>
+			.d1{
+				width: 200px;
+				height: 200px;
+				float: left;
+				
+			}
+			.d1 img{
+				margin: 0 auto;
+				width: 60%;
+				height: 160px;
+				
+			}
+			.d2{
+				width: 160px;
+				height: 160px;
+				float: left;
+				
+			}
+			.d2 img{
+				margin: 0 auto;
+				width: 100%;
+				height: 100%;
+				
+			}
+		</style>
+		<script src="../js/vue.js"></script>
+		<script src="../js/axios.min.js"></script>
+		<script>
+			
+			var request=false;
+			function getHTTPObject(){
+			    var xhr=false;
+			    if(window.XMLHttpRequest){
+			    	xhr=request=new XMLHttpRequest();
+			    }else if(window.ActiveXObject){
+			    	xhr=request=new ActiveXObject("Microsoft.XMLHTTP");
+			    }
+			    return xhr;
+			}
+			
+			
+			function cccc(){
+				var af=document.getElementById("f1").files[0];
+				//alert(af.name);
+				
+				
+				var FileController = "../uploadwenjian";                    // 閿熸枻鎷烽敓鏂ゆ嫹閿熻緝杈炬嫹閿熶茎纭锋嫹閿熶茎鐚存嫹鍙伴敓鏂ゆ嫹鍧� 
+				//alert(fileObj.name);
+				var uid1=window.localStorage.getItem("uid");
+	
+				// FormData 閿熸枻鎷烽敓鏂ゆ嫹
+	
+				var form = new FormData();
+	
+				form.append("uid",uid1);// 閿熸枻鎷烽敓鏂ゆ嫹閿熸枻鎷烽敓鎺ユ唻鎷烽敓鏂ゆ嫹閿熸枻鎷�
+	
+				form.append("file", af,af.name);                           // 閿熶茎纭锋嫹閿熸枻鎷烽敓鏂ゆ嫹
+	
+	
+				request = getHTTPObject();
+	
+				request.open("post", FileController, true);
+				
+				request.onreadystatechange=reaa;
+				
+				request.send(form);
+				
+				
+			}
+			
+			function reaa(){
+				if (request.readyState==4 &&request.status==200) {
+					app1.aaa();	
+				}
+			}
+			
+			function abcd(){
+				document.getElementById("f1").click();
+			}
+		</script>
+	</head>
+	<body>
+		<div id="dd11" style="width: 100%;height: 100%;">
+			
+			
+			<div class="d1">
+				<img src="../images/wenjian.png" />
+				<div style="margin: 0 auto;">测试</div>
+			</div>
+			
+			<div class="d1" v-for="w in ds" @click="dn(w.wname,w.wurl);">
+				<img src="../images/wenjian.png" />
+				<div >{{w.wname}}</div>
+			</div>	
+				
+			<div class="d2">
+				
+				<img src="../images/take_photo.png" onclick="abcd();">
+				<input type="file" id="f1" style="display: none;" onchange="cccc();">
+			
+			</div>
+		</div>
+		
+			<script>
+		  	var app1=new Vue({
+		  		el:"#dd11",
+		  		data:{
+		  			
+		  			ds:[]
+					
+		  		},
+		  		created: function() {
+		  			//var uid=window.localStorage.getItem("uid");
+					
+		  			this.aaa();
+		  			
+		  		},
+		  		methods:{
+		  			aaa:function(){
+		  				var uid=window.localStorage.getItem("uid");
+		  				
+		  				
+		  				axios.get("../allwenjian?uid="+uid)
+		  				  .then((res) => {
+							  //alert(res.data[0].wname);
+		  					  app1.ds=res.data;
+		  					//console.log(response.data);//请求的返回体
+		  				  })
+		  				  .catch((error) => {
+		  					console.log(error);//异常
+		  				  });
+		  			},
+					dn:function(wname,wurl){
+						  const elt = document.createElement('a');
+						  elt.setAttribute('href', wurl);
+						  elt.setAttribute('download', wname);
+						  elt.style.display = 'none';
+						  document.body.appendChild(elt);
+						  elt.click();
+						  document.body.removeChild(elt);
+					}
+		  			
+					
+		  		}
+		  	});
+		  </script>
+					
+	</body>
+</html>
