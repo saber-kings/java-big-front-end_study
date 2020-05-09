@@ -20,8 +20,12 @@ public class Patient implements Serializable {
 	
 	private String sex;
 	
-	private int sid;
+	private Integer sid;
 	
 	private String ptype;
+	
+	public String getSidString() {
+		return this.sid.toString();
+	}
 	
 }

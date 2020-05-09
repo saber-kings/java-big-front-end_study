@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 08/05/2020 01:45:05
+ Date: 10/05/2020 02:28:12
 */
 
 SET NAMES utf8mb4;
@@ -83,15 +83,16 @@ CREATE TABLE `t_user`  (
   `phone` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `upwd` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `real_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `uimg` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES (1, 'zhangsan', '15068971465', '12345678', '张三');
-INSERT INTO `t_user` VALUES (2, 'lisi', '15678946532', '12345678', '李四');
-INSERT INTO `t_user` VALUES (3, 'wangwu', '15432568745', '12345678', '王五');
+INSERT INTO `t_user` VALUES (1, 'zhangsan', '15068971465', '12345678', '张三', 'img/1.jpg');
+INSERT INTO `t_user` VALUES (2, 'lisi', '15678946532', '12345678', '李四', 'img/2.jpg');
+INSERT INTO `t_user` VALUES (3, 'wangwu', '15432568745', '12345678', '王五', '');
 
 -- ----------------------------
 -- Table structure for t_user_role

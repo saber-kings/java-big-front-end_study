@@ -34,7 +34,7 @@ public class GoodDao {
 	public List<Good> dynamicQuery(Good good, double maxPrice, double minPrice) {
 		String sql = "select * from t_good where 1=1";
 		// 这个是用于存储查询的结果的
-		List<Good> result = new ArrayList<>();
+		List<Good> result = null;
 		// 这个用于存储查询的条件参数的
 		List<Object> params = new ArrayList<>();
 		if (good.getId() != 0) {
@@ -64,9 +64,7 @@ public class GoodDao {
 			params.add("%" + good.getGDesc().trim() + "%");
 		}
 		if (params.size()!=0) {
-			for (Object param : params) {
-				result = DH.getall(sql, Good.class, param);
-			}
+			result = DH.getall(sql, Good.class, params.toArray());
 		} else {
 			result = DH.getall(sql, Good.class, (Object[]) null);
 		}

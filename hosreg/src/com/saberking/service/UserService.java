@@ -15,7 +15,7 @@ public class UserService {
 			return "{\"msg\":\"error\"}";
 		} else {
 			Singleton singleton = Singleton.getSingleton();
-			Boolean b = singleton.isOnline(String.valueOf(user.getId()));
+			Boolean b = singleton.isNotOnline(String.valueOf(user.getId()));
 //			Boolean b = true;
 			if (b) {
 //			System.out.println("=================方式一："+JSON.toJSONString(u1));
@@ -34,7 +34,7 @@ public class UserService {
 			return "{\"msg\":\"error\"}";
 		} else {
 			Singleton singleton = Singleton.getSingleton();
-			Boolean b = singleton.isOnline(String.valueOf(user.getId()));
+			Boolean b = singleton.isNotOnline(String.valueOf(user.getId()));
 //			Boolean b = true;
 			if (b) {
 				return JSON.toJSON(user).toString();

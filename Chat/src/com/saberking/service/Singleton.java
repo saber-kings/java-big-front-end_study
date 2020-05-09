@@ -1,9 +1,13 @@
 package com.saberking.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.alibaba.fastjson.JSON;
+import com.github.kevinsawicki.http.HttpRequest;
+import com.saberking.model.Group;
 import com.saberking.model.UserOL;
 
 public class Singleton {
@@ -11,11 +15,11 @@ public class Singleton {
 	// 单例模式
 	private Singleton() {
 		this.groups = new HashMap<>();
-		this.groups.put("1", new Vector<UserOL>());
-		this.groups.put("2", new Vector<UserOL>());
-		this.groups.put("3", new Vector<UserOL>());
-		this.groups.put("4", new Vector<UserOL>());
-		this.groups.put("5", new Vector<UserOL>());
+		String result = HttpRequest.get("http://192.168.31.139:9090/GroupChat/getAllGroups.php").body();
+		List<Group> all = JSON.parseArray(result, Group.class);
+		all.forEach(g -> {
+			this.groups.put(g.getIdString(), new Vector<UserOL>());
+		});
 	}
 
 	private static Singleton singleton;
@@ -27,6 +31,7 @@ public class Singleton {
 		return singleton;
 	}
 
+	
 	private Map<String, Vector<UserOL>> groups;
 	
 	public synchronized Boolean isExisted(String uid, String gid) {
@@ -44,9 +49,12 @@ public class Singleton {
 	
 	public synchronized void groupSend(String uid, String msg, String gid) {
 		Vector<UserOL> users = this.groups.get(gid);
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("uid", uid);
+		map.put("msg", msg);
 		users.forEach(u -> {
 			try {
-				u.getSession().getBasicRemote().sendText(msg);
+				u.getSession().getBasicRemote().sendText(JSON.toJSON(map).toString());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

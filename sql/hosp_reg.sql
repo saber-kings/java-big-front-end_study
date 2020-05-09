@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 08/05/2020 01:44:41
+ Date: 10/05/2020 00:05:43
 */
 
 SET NAMES utf8mb4;
@@ -53,9 +53,9 @@ CREATE TABLE `t_patient`  (
 -- ----------------------------
 -- Records of t_patient
 -- ----------------------------
-INSERT INTO `t_patient` VALUES (1, '赵四', 20, '男', 3, 'z');
-INSERT INTO `t_patient` VALUES (2, '时崎狂三', 20, '女', 3, 'p');
-INSERT INTO `t_patient` VALUES (3, '时崎狂三', 20, '女', 3, 'z');
+INSERT INTO `t_patient` VALUES (1, '小明', 20, '男', 1, 'p');
+INSERT INTO `t_patient` VALUES (2, '小军', 20, '男', 1, 'p');
+INSERT INTO `t_patient` VALUES (3, '小红', 20, '女', 1, 'p');
 
 -- ----------------------------
 -- Table structure for t_role
@@ -71,8 +71,8 @@ CREATE TABLE `t_role`  (
 -- Records of t_role
 -- ----------------------------
 INSERT INTO `t_role` VALUES (1, '员工');
-INSERT INTO `t_role` VALUES (2, '医生');
-INSERT INTO `t_role` VALUES (3, '商品管理员');
+INSERT INTO `t_role` VALUES (2, '挂号员');
+INSERT INTO `t_role` VALUES (3, '医生');
 INSERT INTO `t_role` VALUES (4, '客户管理员');
 
 -- ----------------------------
@@ -91,7 +91,7 @@ CREATE TABLE `t_role_menu`  (
 -- ----------------------------
 INSERT INTO `t_role_menu` VALUES (1, 1, 1);
 INSERT INTO `t_role_menu` VALUES (2, 2, 3);
-INSERT INTO `t_role_menu` VALUES (3, 2, 4);
+INSERT INTO `t_role_menu` VALUES (3, 3, 4);
 INSERT INTO `t_role_menu` VALUES (4, 4, 4);
 
 -- ----------------------------
@@ -122,15 +122,16 @@ CREATE TABLE `t_user`  (
   `phone` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `upwd` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `real_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `sid` int(11) NULL DEFAULT NULL COMMENT '所属科室id',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES (1, 'zhangsan', '15068971465', '12345678', '张三');
-INSERT INTO `t_user` VALUES (2, 'lisi', '15678946532', '12345678', '李四');
-INSERT INTO `t_user` VALUES (3, 'wangwu', '15432568745', '12345678', '王五');
+INSERT INTO `t_user` VALUES (1, 'zhangsan', '15068971465', '12345678', '张三', NULL);
+INSERT INTO `t_user` VALUES (2, 'lisi', '15678946532', '12345678', '李四', 1);
+INSERT INTO `t_user` VALUES (3, 'wangwu', '15432568745', '12345678', '王五', NULL);
 
 -- ----------------------------
 -- Table structure for t_user_role

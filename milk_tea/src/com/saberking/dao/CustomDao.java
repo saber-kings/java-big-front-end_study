@@ -36,7 +36,7 @@ public class CustomDao {
 	public List<Custom> dynamicQuery(Custom custom) {
 		String sql = "select * from t_custom where 1=1";
 		// 这个是用于存储查询的结果的
-		List<Custom> result = new ArrayList<>();
+		List<Custom> result = null;
 		// 这个用于存储查询的条件参数的
 		List<Object> params = new ArrayList<>();
 		if (custom.getId() != 0) {
@@ -56,9 +56,7 @@ public class CustomDao {
 			params.add(custom.getEmail().trim());
 		}
 		if (params.size() != 0) {
-			for (Object param : params) {
-				result = DH.getall(sql, Custom.class, param);
-			}
+			result = DH.getall(sql, Custom.class, params.toArray());
 		} else {
 			result = DH.getall(sql, Custom.class, (Object[]) null);
 		}

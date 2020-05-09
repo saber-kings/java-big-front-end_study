@@ -12,9 +12,9 @@ import com.aliyuncs.profile.DefaultProfile;
 public class SendMsgCode {
 	public static void sendCode(String phone, String code) {
 		// RAM账号的AccessKey ID
-		String accessKeyId = "LTAI4GD1HuevEtXGv65ieUxK";
+		String accessKeyId = "";
 		// RAM账号AccessKey Secret
-		String accessSecret = "ISPD5XOWso03YeQWqyQcMCBBGmHhc6";
+		String accessSecret = "";
 		// 短信签名名称
 		String signName = "SaberKing";
 		// 短信模板ID

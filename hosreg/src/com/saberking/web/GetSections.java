@@ -36,7 +36,6 @@ public class GetSections extends HttpServlet {
 		} else {
 			s = sectionService.getAll();
 		}
-//		String s = sectionService.getAll();
 		// 第三步，输出
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");

@@ -33,12 +33,13 @@
 							<tr>
 								<td>挂号科室：</td>
 								<td colspan="6">科室：<select style="width: 40%" id="part" v-model="patient.sid">
-										<option value="0">选择部门</option>
+										<option value="0">请选择科室</option>
 										<option v-for="s in sections" v-bind:value="s.id">
 											{{s.sname}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;地址：{{s.address}}
 										</option>
 									</select> 挂号类别：
 									<select style="width: 40%" id="person" v-model="patient.ptype">
+										<option value="0">请选择挂号类别</option>
 										<option value="p">普通号</option>
 										<option value="z">专家号</option>
 									</select></td>
@@ -64,7 +65,7 @@
 						age: 0,
 						sex: "男",
 						sid: "0",
-						ptype: ""
+						ptype: "0"
 					},
 					sections: []
 				},
@@ -85,15 +86,13 @@
 							alert("请输入正确年龄");
 						} else if (this.patient.sid == "0") {
 							alert("请选择科室");
+						} else if (this.patient.ptype == "0") {
+							alert("请选择挂号类别");
 						} else {
 							axios.post("../orderNum", this.patient)
 								.then((res) => {
 									//app.sections=res.data;
 									alert(res.data.msg);
-									if (res.data.msg="success") {
-										window.localStorage.setItem("sid", this.patient.sid);
-										window.localStorage.setItem("ptype", this.patient.ptype);
-									}
 								})
 								.catch((error) => {
 									console.log(error); //异常

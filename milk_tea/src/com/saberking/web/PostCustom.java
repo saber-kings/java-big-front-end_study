@@ -40,7 +40,7 @@ public class PostCustom extends HttpServlet {
 			//添加
 			s = customService.add(custom);
 		} else {
-			//删除
+			//修改
 			s = customService.update(custom);
 		}
 		// 第三步，输出

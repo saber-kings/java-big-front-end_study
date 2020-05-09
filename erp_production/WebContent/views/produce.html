@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>生产管理</title>
+		<link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		<link href="../css/animate.min.css" rel="stylesheet" />
+		<style>
+			.t123 {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				right: 0px;
+				bottom: 0px;
+				z-index: 999;
+				background-color: rgba(0, 0, 0, .85);
+			}
+			
+			.t123 .info {
+				width: 300px;
+				height: 40px;
+				margin: 200px auto;
+				margin-bottom: 0;
+				background-color: rgba(0, 0, 0, .1);
+				border-radius: 3px;
+				color: white;
+				text-align: center;
+				line-height: 40px;
+				z-index: 9999 !important;
+			}
+			
+			.t123 .error{
+				width: 300px;
+				height: 40px;
+				margin: 200px auto;
+				background-color: rgba(0, 0, 0, .1);
+				border-radius: 3px;
+				color: red;
+				text-align: center;
+				line-height: 40px;
+				z-index: 9999 !important;
+			}
+			
+			.my-table {
+				margin-top: 10px;
+				border: 1px solid rgba(0,0,0,0.05);
+				margin-left: 15px;
+			}
+			
+			tr.ant-table-row>td {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 50px;
+			}
+			
+			.margin-left-sm{
+				margin-left: 15px;
+			}
+			
+			@media (max-width: 768px) {
+			  .my-btn-xs {
+				  padding: 5px 5px !important;
+			      max-width: 50px !important;
+			  }
+			  .media-margin-left-sm{
+				  margin-left: 5px;
+			  }
+			}
+			
+			[v-cloak] {
+				display: none
+			}
+		</style>
+	</head>
+	<body style="background-color: rgba(0,0,0,0.04);">
+		<div id="app" class="container-fluid">
+			<!-- 利用vue.js+animate.css手写实现弹出层 -->
+			<transition leave-active-class="animated fadeOut" enter-active-class="animated fadeIn">
+				<div class="t123" v-show="showMask" v-cloak>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="info" v-show="showInfo">
+							<div>"{{info}}"</div>
+						</div>
+					</transition>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="error" v-show="showError">
+							<div>"{{info}}"</div>
+						</div>
+					</transition>
+				</div>
+			</transition>
+			<div class="container-fluid row form-inline" style="margin-top: 40px;">
+				<!-- <form class="form-inline"> -->
+					<div class="form-group margin-left-sm media-margin-left-sm">
+						<label for="wname">当前车间: </label>
+						<input type="text" id="wname" class="form-control" style="border-radius: 3px;" v-model="wname" readonly>
+					</div>
+					<div class="form-group margin-left-sm media-margin-left-sm">
+						<label for="pline">生产线: </label>
+						<select id="pline" class="form-control" style="border-radius: 3px;" v-model="pline">
+							<option value="1">1号生产线</option>
+							<option value="2">2号生产线</option>
+							<option value="3">3号生产线</option>
+						</select>
+					</div>
+					<button type="button" 
+						class="btn btn-success btn-sm my-btn-xs margin-left-sm media-margin-left-sm" 
+						v-show="isCanProduce" @click="produce();" v-cloak>
+						<span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+						<span>生产</span>
+					</button>
+				<!-- </form> -->
+			</div>
+			<table class="table table-hover my-table">
+				<thead>
+					<tr align="center">
+						<td>待产顺序</td>
+						<td>产品名称</td>
+						<td>产品总数</td>
+						<td>产品模具</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr align="center" class="ant-table-row" v-for="(p,index) in productQueue" v-cloak>
+						<td>{{index+1}}</td>
+						<td>{{p.pname}}</td>
+						<td>{{p.needNum}}</td>
+						<td>{{p.mould}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/axios.min.js"></script>
+		<script>
+			var app = new Vue({
+				el: "#app",
+				data: {
+					wname: "",
+					qmessage: "",
+					pline: "1",
+					productQueue: [],
+					showMask: false,
+					showInfo: false,
+					showError: false,
+					isCanProduce: false,
+					info: ""
+				},
+				created: function() {
+					var wid = window.localStorage.getItem("wid");
+					if (wid != null) {
+						this.isCanProduce = true;
+						axios.get("../getWorkshops?id=" + wid)
+							.then((res) => {
+								var workshops = res.data;
+								app.wname = workshops[0].wname;
+							})
+							.catch((error) => {
+								console.log(error); //异常
+							});
+						axios.get("../getProductQueue?wid=" + wid + "&pline=" + this.pline)
+							.then((res) => {
+								if (res.data.msg == null) {
+									// console.log(res.data);
+									this.productQueue = res.data;
+								} else if (res.data.msg === "isNull") {
+									app.propError("当前生产线无排产产品!");
+								}
+							})
+							.catch((error) => {
+								console.log(error); //异常
+							});
+						// alert(wid);
+					} else {
+						this.isCanProduce = false;
+					}
+				},
+				methods: {
+					<!-- 利用vue.js+animate.css手写实现弹出层 -->
+					openMask: function() {
+						this.showMask = true;
+					},
+					closeMask: function() {
+						this.showMask = false;
+					},
+					openInfo: function(msg) {
+						this.info = msg;
+						this.showInfo = true;
+					},
+					closeInfo: function() {
+						this.showInfo = false;
+					},
+					openError: function(msg) {
+						this.info = msg;
+						this.showError = true;
+					},
+					closeError: function() {
+						this.showError = false;
+					},
+					propInfo: function(msg) {
+						this.openMask();
+						this.openInfo(msg);
+						setTimeout(function() {
+							app.closeInfo();
+							app.closeMask();
+						}, 1500);
+					},
+					propError: function(msg) {
+						this.openMask();
+						this.openError(msg);
+						setTimeout(function() {
+							app.closeMask();
+							app.closeError();
+						}, 3000);
+					},
+					produce: function() {
+						var wid = window.localStorage.getItem("wid");
+						if (this.isCanProduce) {
+							axios.get("../produce?wid=" + wid + "&pline=" + this.pline)
+								.then((res) => {
+									var res = res.data;
+									if (res.msg == null) {
+										var str = "";
+										switch(app.pline) {
+											case "1":
+												str = "1号生产线";
+												break;
+											case "2":
+												str = "2号生产线";
+												break;
+											case "3":
+												str = "3号生产线";
+												break;
+											default:
+												break;
+										}
+										if (str!=="") {
+											this.qmessage = "工人同志们！" + str + " 要开始生产 " + res.pname + " 了";
+											window.top.w.send(this.qmessage);
+											this.productQueue.shift();
+										} else {
+											app.propError("请选择生产线!");
+										}
+									} else if (res.msg === "isNull") {
+										app.propError("当前生产线无排产产品!");
+									}
+								})
+								.catch((error) => {
+									console.log(error); //异常
+								});
+						} else {
+							app.propError("当前无车间!");
+						}
+					}
+				},
+				watch: {
+					pline(newval){
+						var wid = window.localStorage.getItem("wid");
+						axios.get("../getProductQueue?wid=" + wid + "&pline=" + newval)
+							.then((res) => {
+								if (res.data.msg == null) {
+									this.productQueue = res.data;
+								} else if (res.data.msg === "isNull") {
+									var size = this.productQueue.length;
+									this.productQueue.splice(0, size);
+									app.propError("当前生产线无排产产品!");
+								}
+							})
+							.catch((error) => {
+								console.log(error); //异常
+							});
+					}
+				}
+			});
+		</script>
+
+
+	</body>
+</html>
