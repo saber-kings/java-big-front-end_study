@@ -121,7 +121,7 @@
 			.leftd_h{
 				width: 39px;
 				height: 39px;
-				border-radius: 100%;
+				/* border-radius: 100%; */
 				display: block;
 				float: left;
 				overflow: hidden;
@@ -135,7 +135,7 @@
 			.rightd_h{
 				width: 39px;
 				height: 39px;
-				border-radius: 100%;
+				/* border-radius: 100%; */
 				display: block;
 				float: right;
 				overflow: hidden;
@@ -146,6 +146,58 @@
 				width: 100%;
 				height: auto;
 			}
+			
+			body>.mui-bar {  
+				box-shadow: 0 0 1px transparent;  
+			}  
+			.footer-right {  
+				position: absolute;  
+				width: 50px;  
+				height: 50px;  
+				right: 0px;  
+				bottom: 0px;  
+				text-align: center;  
+				vertical-align: middle;  
+				display: inline-block;  
+			}  
+	
+			#send-btn {  
+				width: 100% !important;  
+				height: 90% !important;  
+				color: red;  
+				border-radius: 0;
+				border-left: 0;
+			}  
+	
+			.footer-center {  
+				position: absolute;
+				left: 0px;
+				width: calc(100% - 50px); 
+				bottom: 0px;
+				height: 100%;
+				padding: 5px 0px;
+				padding-top: 0 !important;
+			}  
+	
+			.footer-center [class*=input] {  
+				width: 100%;  
+				height: 100%;
+			}  
+	
+			.footer-center .input-text {  
+				background: #fff;  
+				border: solid 1px #ddd;  
+				padding: 10px !important;  
+				font-size: 16px !important;  
+				line-height: 18px !important;  
+				font-family: verdana !important;  
+				overflow: hidden;  
+			}
+			
+			#msg-text {
+				border-radius: 0;
+			}
+			
 			[v-cloak] { display: none }
 		</style>
 		<script src="js/mui.min.js"></script>
@@ -160,26 +212,58 @@
 			var w;
 			function initSocket() {
 				var uid = window.localStorage.getItem("uid");
-				w = new WebSocket("ws://192.168.31.139:8989/Chat/echo/" + uid+"/1");
+				// console.log(uid);
+				var gid = window.localStorage.getItem("gid");
+				w = new WebSocket("ws://192.168.31.139:8989/Chat/echo/" + uid+"/" + gid);
 				w.onopen = function() {
-					w.send("open ws");
+					
 				};
 				w.onclose = function() {
 				
 				};
 				w.onmessage = function(event) {
-					app1.showMsgs(event.data);
+					app1.showMsgs(JSON.parse(event.data));
 				};
 			}
 			function publish() {
-				var msg = document.getElementById("msg").value;
+				var msg = document.getElementById("msg-text").value;
 				if (msg == "") {
 					alert("不能为空")
 				} else{
-					document.getElementById("msg").value="";
+					document.getElementById("msg-text").value="";
 					w.send(msg);
 				}
 			}
+			document.onkeydown=function(event){   
+			        var e = event || window.event || arguments.callee.caller.arguments[0];   
+			        if(e && e.keyCode==27){ // 按 Esc    
+			            //要做的事情   
+			            // alert("按 Esc");   
+			        }  
+			        if(e && e.keyCode==8){ // 按 BackSpace    
+			            //要做的事情   
+			            // alert("按 BackSpace");   
+			        } 
+			        if(e && e.keyCode==113){ // 按 F2    
+			            //要做的事情   
+			            // alert("按 F2");   
+			        }   
+			        if(e && e.keyCode==123){ // 按 F12    
+			            //要做的事情   
+			            // alert("按 F12");   
+			        }              
+			        if(e && e.keyCode==13){ // enter 键   
+			            //要做的事情   
+			            // alert("按 Enter");  
+						 publish();
+			        }  
+			        if (e.keyCode == 86 && e.ctrlKey) {    
+			            // alert("你按下了Ctrl+V");    
+			        }  
+			        if (e.keyCode == 83 && e.ctrlKey) {    
+			            // alert("你按下了Ctrl+S");    
+			        }  
+			};    
 		</script>
 	</head>
 	<body onload="initSocket();">
@@ -189,55 +273,71 @@
 				<h1 class="mui-title" v-cloak>{{gname}}</h1>
 				<a class="mui-icon mui-icon-right-nav mui-pull-right mui-icon-more"></a>
 			</header>
-			<div class="mui-content" style="overflow: auto;">
-				<div class="leftd">
-					<span class="leftd_h">
-						<img src="img/logo.png" />
-					</span>
-
-					<div class="speech left" class="speech left">
-						二货！
+			<div class="mui-content" id="message-content" style="overflow: auto;margin-bottom: 50px;margin-top: 5px;">
+				<div  v-for="m in msgs">
+					<div class="rightd"  v-show="m.uid===uid" v-cloak>
+						<span class="rightd_h">
+							<img :src="m.uimg" style="border-radius:8px;" />
+						</span>
+						<div class="speech right" class="speech left">
+							{{m.msg}}
+						</div>
+					</div>
+					<div class="leftd" v-show="m.uid!==uid" v-cloak>
+						<span class="leftd_h">
+							<img :src="m.uimg" style="border-radius:8px;" />
+						</span>
+					
+						<div class="speech left" class="speech left">
+							{{m.msg}}
+						</div>
 					</div>
 				</div>
-				<div class="rightd">
-					<span class="rightd_h">
-						<img src="img/hy.png" />
-					</span>
-					<div class="speech right" class="speech left">
-						嘻嘻嘻嘻。。。。。。
-					</div>
-				</div>
-				<div class="leftd" v-for="m in msgs" v-cloak>
-					<span class="leftd_h">
-						<img src="img/logo.png" />
-					</span>
-
-					<div class="speech left" class="speech left">
-						{{m}}
-					</div>
-				</div>
+				
 			</div>
 		</div>
 		<script>
 			var app1 = new Vue({
 				el:"#content",
 				data:{
+					uid: "",
 					gname:"",
 					msgs:[]
 				},
 				created:function(){
+					this.uid = window.localStorage.getItem("uid");
 					this.gname = window.localStorage.getItem("gname");
 				},
 				methods:{
 					showMsgs:function(msg){
-						this.msgs.push(msg);
+						mui.ajax("http://192.168.31.139:8989/GroupChat/getUser?uid=" + msg.uid, {
+							dataType: 'json', //服务器返回json格式数据
+							type: 'get', //HTTP请求类型
+							timeout: 10000, //超时时间设置为10秒；
+							success: function(data) {
+								if (data!=null) {
+									msg.uimg = "http://192.168.31.139:8989/GroupChat/" + data.uimg;
+									app1.msgs.push(msg);
+								}
+							},
+							error: function(xhr, type, errorThrown) {
+								//异常处理；
+								alert(type);
+							}
+						});
+						window.scrollTo(0, document.body.scrollHeight)
 					}
 				}
 			});
 		</script>
 
-		<nav class="mui-bar mui-bar-tab">
-			<input type="text" id="msg" /><button onclick="publish();">提交</button>
+		<nav class="mui-bar mui-bar-tab" id="input-watch" style="back">
+			<div class="footer-center">
+				<input type="text" id="msg-text" type="text" placeholder="输入聊天内容" class="input-text">
+			</div>
+			<label class="footer-right">
+				<button type="button" id="send-btn" onclick="publish();">发送</button>
+			</label>
 		</nav>
 	</body>
 </html>
