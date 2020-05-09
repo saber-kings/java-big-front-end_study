@@ -378,7 +378,7 @@
 			</table>
 		</div>
 		<script>
-			var app1 = new Vue({
+			var app = new Vue({
 				el: "#d123",
 				data: {
 					sG: {
@@ -404,7 +404,7 @@
 				created: function() {
 					axios.get("../getGoods")
 						.then((res) => {
-							app1.goods = res.data;
+							app.goods = res.data;
 						})
 						.catch((error) => {
 							console.log(error); //异常
@@ -475,14 +475,14 @@
 						this.openMask();
 						this.openInfo(msg);
 						setTimeout(function() {
-							app1.closeInfo();
-							app1.closeMask();
+							app.closeInfo();
+							app.closeMask();
 						}, 1500);
 					},
 					propError: function(msg) {
 						this.openError(msg);
 						setTimeout(function() {
-							app1.closeError();
+							app.closeError();
 						}, 3000);
 					},
 					search: function() {

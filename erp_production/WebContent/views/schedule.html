@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>排产管理</title>
+		<link href="../css/tail.css" rel="stylesheet" type="text/css" />
+		<link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+		<link rel="stylesheet" href="../css/animate.min.css" />
+		<style>
+			.t123 {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				right: 0px;
+				bottom: 0px;
+				z-index: 999;
+				background-color: rgba(0, 0, 0, .85);
+			}
+			
+			.t123 .info {
+				width: 300px;
+				height: 40px;
+				margin: 200px auto;
+				margin-bottom: 0;
+				background-color: rgba(0, 0, 0, .1);
+				border-radius: 3px;
+				color: white;
+				text-align: center;
+				line-height: 40px;
+				z-index: 9999 !important;
+			}
+			
+			.t123 .error{
+				width: 300px;
+				height: 40px;
+				margin: 200px auto;
+				background-color: rgba(0, 0, 0, .1);
+				border-radius: 3px;
+				color: red;
+				text-align: center;
+				line-height: 40px;
+				z-index: 9999 !important;
+			}
+			
+			.my-table {
+				margin-top: 10px;
+				border: 1px solid rgba(0,0,0,0.05);
+				margin-left: 15px;
+			}
+			
+			tr.ant-table-row>td {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 50px;
+			}
+			
+			.margin-left-sm{
+				margin-left: 15px;
+			}
+			
+			@media (max-width: 768px) {
+			  .my-btn-xs {
+				  padding: 5px 5px !important;
+			      max-width: 50px !important;
+			  }
+			  .media-margin-left-sm{
+				  margin-left: 5px;
+			  }
+			}
+			
+			[v-cloak] {
+				display: none
+			}
+		</style>
+	</head>
+	<body style="border-radius: 25px;background-color: rgba(0,0,0,0.04);">
+		<!--<div class="title"><h2>通知详情</h2></div>-->
+		<div class="container-fluid margin-left-sm" id="app">
+			<transition leave-active-class="animated fadeOut" enter-active-class="animated fadeIn">
+				<div class="t123" v-show="showMask" v-cloak>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="info" v-show="showInfo">
+							<div>"{{info}}"</div>
+						</div>
+					</transition>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="error" v-show="showError">
+							<div>"{{info}}"</div>
+						</div>
+					</transition>
+				</div>
+			</transition>
+			
+			<form class="form-horizontal" style="margin: 150px auto;width: 600px;background-color: rgba(0,0,0,0.05);padding: 25px;">
+				<div class="form-group">
+					<label for="pname" class="col-sm-2 control-label">产品名称:&nbsp;</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="pname" v-model="product.pname" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="needNum" class="col-sm-2 control-label">产品数量:&nbsp;</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="needNum" minlength="1" v-model="product.needNum" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="mould" class="col-sm-2 control-label">产品模具:&nbsp;</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="mould" v-model="product.mould" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="wid" class="col-sm-2 control-label">排产车间:&nbsp;</label>
+					<div class="col-sm-10">
+						<select class="form-control" id="wid" v-model="product.wid">
+							<option value="0">请选择选择车间</option>
+							<option v-for="w in workshops" v-bind:value="w.id">
+								{{w.wname}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;地址：{{w.address}}
+							</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="pline" class="col-sm-2 control-label">排产产线:&nbsp;</label>
+					<div class="col-sm-10">
+						<select class="form-control" id="pline" v-model="product.pline">
+							<option value="0">请选择排产生产线</option>
+							<option value="1">1号生产线</option>
+							<option value="2">2号生产线</option>
+							<option value="3">3号生产线</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group" style="margin: 0 10px 0 15px;">
+					<button type="button" class="btn btn-primary pull-left" @click="schedule();">排产</button>
+					<button type="reset" class="btn btn-default pull-right">重填</button>
+				</div>
+			</form>
+		</div>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/axios.min.js"></script>
+		<script>
+			var app = new Vue({
+				el: "#app",
+				data: {
+					product: {
+						pname: "",
+						needNum: 0,
+						mould: "",
+						wid: "0",
+						pline: "0",
+					},
+					workshops: [],
+					showMask: false,
+					showInfo: false,
+					showError: false,
+					info: ""
+				},
+				created: function() {
+					axios.get("../getWorkshops")
+						.then((res) => {
+							this.workshops = res.data;
+						})
+						.catch((error) => {
+							console.log(error); //异常
+						});
+				},
+				methods: {
+					openMask: function() {
+						this.showMask = true;
+					},
+					closeMask: function() {
+						this.showMask = false;
+					},
+					openInfo: function(msg) {
+						this.info = msg;
+						this.showInfo = true;
+					},
+					closeInfo: function() {
+						this.showInfo = false;
+					},
+					openError: function(msg) {
+						this.info = msg;
+						this.showError = true;
+					},
+					closeError: function() {
+						this.showError = false;
+					},
+					propInfo: function(msg) {
+						this.openMask();
+						this.openInfo(msg);
+						setTimeout(function() {
+							app.closeInfo();
+							app.closeMask();
+						}, 1500);
+					},
+					propError: function(msg) {
+						this.openMask();
+						this.openError(msg);
+						setTimeout(function() {
+							app.closeMask();
+							app.closeError();
+						}, 3000);
+					},
+					schedule: function() {
+						if (this.product.pname == "") {
+							app.propError("请填写产品名称");
+						} else if (isNaN(this.product.needNum)) {
+							app.propError("请输入正确的产品数量");
+						} else if (this.product.needNum <= 0) {
+							app.propError("产品数量必须大于0");
+						} else if (this.product.wid == "0") {
+							app.propError("请选择生产车间");
+						} else if (this.product.pline == "0") {
+							app.propError("请选择生产线");
+						} else {
+							axios.post("../schedule", this.product)
+								.then((res) => {
+									//app.workshops=res.data;
+									if (res.data.msg="success") {
+										app.propInfo("排产成功");
+									} else{
+										app.propError("排产失败");
+									}
+								})
+								.catch((error) => {
+									console.log(error); //异常
+								});
+						}
+					}
+				}
+			});
+		</script>
+
+	</body>
+
+
+</html>

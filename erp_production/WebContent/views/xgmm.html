@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>修改密码</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link href="../css/xgmm.css" media="screen" rel="stylesheet" />
+		<link href="../css/reset.css" type="text/css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/animate.min.css" />
+		<style>
+			[v-cloak] { display: none }
+		</style>
+		<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/axios.min.js"></script>
+	</head>
+	<body>
+		<div id="base">
+			<transition leave-active-class="animated fadeOut" enter-active-class="animated fadeIn">
+				<div class="t123" v-show="showMask" v-cloak>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="info" v-show="showInfo">
+							<div>"{{info}}"</div>
+						</div>
+					</transition>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="error" v-show="showError">
+							<div>"{{info}}"</div>
+						</div>
+					</transition>
+				</div>
+			</transition>
+			<div class="xgmm">
+				<div class="xgmm-top">
+					修改密码
+				</div>
+				<div class="xgmm-center clearfix">
+					<div class="xgmm-center-img"><img src="../images/password.png" /></div>
+					<div class="xgmm-center-input">
+						<input type="password" placeholder="请输入您的原密码" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的原密码'"
+						 v-model="opwd" />
+						<div id="xgmm-msg-opwd" class="xgmm-center-input-text">原密码<span v-show="showo" v-cloak>不正确</span></div>
+					</div>
+				</div>
+				<div class="xgmm-center clearfix">
+					<div class="xgmm-center-img"><img src="../images/password.png" /></div>
+					<div class="xgmm-center-input">
+						<input type="password" placeholder="请输入您的新密码" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的新密码'"
+						 v-model="npwd" />
+						<div id="xgmm-msg-npwd" class="xgmm-center-input-text"><span v-show="!shown" v-cloak>新密码</span><span v-show="shown"
+							 v-cloak>密码长度要求8位以上</span></div>
+					</div>
+				</div>
+				<div class="xgmm-center clearfix">
+					<div class="xgmm-center-img"><img src="../images/password.png" /></div>
+					<div class="xgmm-center-input">
+						<input type="password" placeholder="请再次输入新密码" onfocus="this.placeholder=''" onblur="this.placeholder='请再次输入新密码'"
+						 v-model="rnpwd" />
+						<div id="xgmm-msg-rnpwd" class="xgmm-center-input-text"><span v-show="!showr" v-cloak>确认新密码</span><span v-show="showr"
+							 v-cloak>两次密码输入不一致</span></div>
+					</div>
+				</div>
+				<div class="xgmm-center clearfix" style="padding: 0 60px;">
+					<div class="xgmm-button" v-show="showButton" @click="submit();" v-cloak>
+						确认
+					</div>
+					<div class="reset-button" @click="reset();">
+						重置
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: "#base",
+				data: {
+					opwd: "",
+					npwd: "",
+					rnpwd: "",
+					ropwd: "",
+					showMask: false,
+					showo: false,
+					shown: false,
+					showr: false,
+					showInfo: false,
+					showError: false,
+					info: ""
+				},
+				created: function() {
+					var uid = window.localStorage.getItem("uid");
+					axios.get("../getPwd?uid=" + uid)
+						.then((res) => {
+							app.ropwd = res.data.upwd;
+						})
+						.catch((error) => {
+							console.log(error); //异常
+						});
+				},
+				computed: {
+					showButton: function() {
+						if (this.opwd == "" || this.npwd == "" || this.rnpwd == "") {
+							return false;
+						} else {
+							return !this.showo & !this.shown & !this.showr;
+						}
+					}
+				},
+				methods: {
+					beColor: function(el, color) {
+						$(el).css("color", color);
+					},
+					reset: function() {
+						this.opwd = "";
+						this.npwd = "";
+						this.rnpwd = "";
+					},
+					openInfo: function(msg) {
+						this.info = msg;
+						this.showInfo = true;
+					},
+					closeInfo: function() {
+						this.showInfo = false;
+					},
+					openError: function(msg) {
+						this.info = msg;
+						this.showMask = true;
+						this.showError = true;
+					},
+					closeError: function() {
+						this.showError = false;
+						this.showMask = false;
+					},
+					propInfo: function(msg) {
+						this.showMask = true;
+						this.openInfo(msg);
+						setTimeout(function() {
+							app.closeInfo();
+							app.showMask = false;
+						}, 1500);
+					},
+					propError: function(msg) {
+						this.openError(msg);
+						setTimeout(function() {
+							app.closeError();
+						}, 2000);
+					},
+					reLogin: function() {
+						setTimeout(function() {
+							window.localStorage.removeItem("uid");
+							window.localStorage.removeItem("realName");
+							top.location.href = "../login.html";
+						}, 2000);
+					},
+					submit: function() {
+						var uid = window.localStorage.getItem("uid");
+						axios.get("../changePwd?uid=" + uid + "&pwd=" + this.npwd)
+							.then((res) => {
+								var r1 = res.data;
+								if (r1.msg == "success") {
+									this.propInfo("修改成功，两秒后将跳转到登录页重新登录");
+									this.reLogin();
+								} else {
+									this.propError("修改失败");
+								}
+							})
+							.catch((error) => {
+								console.log(error); //异常
+							});
+					}
+				},
+				watch: {
+					opwd: function(newval) {
+						if (newval == "") {
+							this.beColor("#xgmm-msg-opwd", "dodgerblue");
+							this.showo = false;
+						} else if (newval == this.ropwd) {
+							this.beColor("#xgmm-msg-opwd", "dodgerblue");
+							this.showo = false;
+						} else {
+							this.beColor("#xgmm-msg-opwd", "firebrick");
+							this.showo = true;
+						}
+					},
+					npwd: function(newval) {
+						if (newval.length < 8 && newval.length >= 1) {
+							this.beColor("#xgmm-msg-npwd", "firebrick");
+							this.shown = true;
+						} else {
+							this.beColor("#xgmm-msg-npwd", "dodgerblue");
+							this.shown = false;
+						}
+					},
+					rnpwd: function(newval) {
+						if (newval == "") {
+							this.beColor("#xgmm-msg-rnpwd", "dodgerblue");
+							this.showr = false;
+						} else if (newval == this.npwd && this.npwd != "") {
+							this.beColor("#xgmm-msg-rnpwd", "dodgerblue");
+							this.showr = false;
+						} else {
+							this.beColor("#xgmm-msg-rnpwd", "firebrick");
+							this.showr = true;
+						}
+					}
+				}
+			});
+		</script>
+	</body>
+</html>

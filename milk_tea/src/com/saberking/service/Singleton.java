@@ -31,7 +31,7 @@ public class Singleton {
 		this.usersMap.remove(uid);
 	}
 
-	public synchronized Boolean isUser(String uid) {
+	public synchronized Boolean isNotOnline(String uid) {
 		Session session = this.usersMap.get(uid);
 		if (session == null) {
 			return true;

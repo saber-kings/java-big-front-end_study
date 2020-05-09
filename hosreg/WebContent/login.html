@@ -32,14 +32,16 @@
 				<div class="login-center clearfix">
 					<div class="login-center-img"><img src="images/name.png" /></div>
 					<div class="login-center-input">
-						<input type="text" placeholder="请输入您的用户名" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的用户名'" v-model="un" />
+						<input type="text" placeholder="请输入您的用户名" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的用户名'"
+						 v-model="un" />
 						<div class="login-center-input-text">用户名</div>
 					</div>
 				</div>
 				<div class="login-center clearfix">
 					<div class="login-center-img"><img src="images/password.png" /></div>
 					<div class="login-center-input">
-						<input type="password" placeholder="请输入您的密码" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的密码'" v-model="up" />
+						<input type="password" placeholder="请输入您的密码" onfocus="this.placeholder=''" onblur="this.placeholder='请输入您的密码'"
+						 v-model="up" />
 						<div class="login-center-input-text">密码</div>
 					</div>
 				</div>
@@ -100,15 +102,18 @@
 						} else {
 							axios.get("login?un=" + this.un + "&up=" + this.up)
 								.then((res) => {
-									var r1 = res.data;
-									// alert(r1);
-									if (r1.msg == "error") {
+									var res = res.data;
+									// alert(res);
+									if (res.msg == "error") {
 										this.propError("登陆失败");
-									}else if(r1.msg == "logined"){
+									} else if (res.msg == "logined") {
 										this.propError("用户已登录");
 									} else {
-										window.localStorage.setItem("uid", r1.id);
-										window.localStorage.setItem("realName", r1.realName);
+										window.localStorage.setItem("uid", res.id);
+										window.localStorage.setItem("realName", res.realName);
+										if (res.sid != null) {
+											window.localStorage.setItem("sid", res.sid);
+										}
 										window.location.href = "index.html";
 									}
 								})
@@ -120,15 +125,15 @@
 				},
 				//相当于onload，加载完DOM树后执行
 				created: function() {
-			
+
 				},
 				//运算函数
 				computed: {
-			
+
 				},
 				//监听器
 				watch: {
-			
+
 				}
 			});
 		</script>

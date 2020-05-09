@@ -12,16 +12,6 @@
 .bot_btn .btn1 a{display: block}
 .title{  background:url(../images/righttitlebig.png) repeat-x; border:1px solid #c1d3de; overflow:visible;}
 .title h2{line-height:33px; margin-left:7px; padding-left:22px; font-weight:bold; font-size:14px; font-family:'宋体'; color:#000000; background:url(../images/titleico.png) no-repeat left center;}
-.i_start {
-    width: 8px;
-    height: 8px;
-    position: relative;
-    display: inline-block;
-    background-image: url("../images/start.png");
-
-    margin-right: 5px;
-    top:-2px;
-}
 .raido{
   position: relative;top:2px;margin-left: 5px;margin-right: 10px;
 }

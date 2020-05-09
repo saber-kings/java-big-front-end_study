@@ -12,9 +12,15 @@
 	</head>
 	<body>
 		<div id="app">
-			当前科室：<b v-cloak>{{sname}}</b>
+			当前科室:&nbsp;<b v-cloak>{{sname}}</b>
+			&nbsp;&nbsp;
+			类型:&nbsp;
+			<select style="width: 40%" v-model="ptype">
+				<option value="p">普通号</option>
+				<option value="z">专家号</option>
+			</select>
 			<div v-html="qmessage" v-cloak></div>
-			<div @click="call();" :class="isCanCall?'btn btn-success btn-lg':'btn btn-success btn-lg disabled'">
+			<div @click="call();" class="btn btn-success btn-lg" v-show="isCanCall" v-cloak>
 				叫号
 			</div>
 		</div>
@@ -26,6 +32,7 @@
 				data: {
 					sname: "",
 					qmessage: "",
+					ptype: "p",
 					isCanCall: false
 				},
 				created: function() {
@@ -41,7 +48,7 @@
 							.catch((error) => {
 								console.log(error); //异常
 							});
-						alert(sid);
+						// alert(sid);
 					} else {
 						this.isCanCall = false;
 					}
@@ -49,9 +56,8 @@
 				methods: {
 					call: function() {
 						var sid = window.localStorage.getItem("sid");
-						var ptype = window.localStorage.getItem("ptype");
 						if (this.isCanCall) {
-							axios.get("../callNum?sid=" + sid + "&ptype=" + ptype)
+							axios.get("../callNum?sid=" + sid + "&ptype=" + this.ptype)
 								.then((res) => {
 									//app.ks=res.data;
 									var res = res.data;

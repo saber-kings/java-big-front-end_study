@@ -22,10 +22,10 @@ public class Singleton {
 		// 初始化所有科室
 		this.sectionRoom = new HashMap<>();
 
-		// 得到所有科室（不分普通科/专科）
+		// 得到所有科室（不分普通科/专家科）
 		List<Section> sections = sectionDao.getAll();
 		
-		// 遍历所有科室将每一个科室分成普通科和专科两个队列，然后将所有科室加入
+		// 遍历所有科室将每一个科室分成普通科和专科两个科室类型的挂号队列，然后将所有科室加入
 		// 方式一for循环
 //		for (int i = 0; i < sections.size(); i++) {
 //			// 得到一个科室
@@ -34,20 +34,20 @@ public class Singleton {
 //			Map<String, Queue<Patient>> map = new HashMap<>();
 //			// 普通科
 //			map.put("p", new MyQueue<Patient>());
-//			// 专科
+//			// 专家科
 //			map.put("z", new MyQueue<Patient>());
 //
 //			// 将当前科室加入
-//			this.sectionRoom.put(section.getId() + "", map);
+//			this.sectionRoom.put(section.getIdString(), map);
 //		}
 		
 		// 方式二：lambda方式 （推荐）
 		this.sectionRoom = sections.stream().collect(Collectors.toMap( Section::getIdString ,section -> {
-			// 将每一个科室分为普通科和专科
+			// 将每一个科室分为普通科和专家科两个类型的科室
 			Map<String, Queue<Patient>> map = new HashMap<>();
 			// 普通科
 			map.put("p", new MyQueue<Patient>());
-			// 专科
+			// 专家科
 			map.put("z", new MyQueue<Patient>());
 			return map;
 		}));
@@ -74,7 +74,7 @@ public class Singleton {
 //		System.out.println(this.userOnline.size());
 	}
 
-	public synchronized Boolean isOnline(String uid) {
+	public synchronized Boolean isNotOnline(String uid) {
 		Session session = this.userOnline.get(uid);
 		if (session == null) {
 			return true;
@@ -112,37 +112,37 @@ public class Singleton {
 	 */
 	public synchronized void order(Patient p) {
 		// 病人挂号的科室 id
-		System.out.println("sid:" + p.getSid());
+		System.out.println("sid:" + p.getSidString());
 		// 获得其挂号的科室
-		Map<String, Queue<Patient>> map = this.sectionRoom.get(p.getSid() + "");
-		// 根据病人类型获得其要挂号的科室类型所在的排队队列（普通科/专科）
+		Map<String, Queue<Patient>> map = this.sectionRoom.get(p.getSidString());
+		// 根据病人挂号的科室类型获得其要挂号的对应类型的科室所在的排队队列（普通科/专科）
 		Queue<Patient> queue = map.get(p.getPtype());
 		// 打印挂号前的挂号病人数量
-		System.out.println("添加之前：" + queue.size());
+		System.out.println("添加之前：" + String.valueOf(queue.size()));
 		// 将病人加入挂号队列
 		queue.add(p);
 		// 打印挂号后的挂号病人数量
-		System.out.println("添加之后：" + queue.size());
+		System.out.println("添加之后：" + String.valueOf(queue.size()));
 	}
 
 	/**
 	 * 叫号
 	 * @param sid 科室 id
-	 * @param ptype 病人类型（普通科/专科）
+	 * @param ptype 病人挂号科室类型（普通科/专科）
 	 * @return 返回叫到号的病人
 	 */
 	public synchronized Patient call(String sid, String ptype) {
 		System.out.println("叫号sid:" + sid);
 		// 获得当前科室
 		Map<String, Queue<Patient>> map = this.sectionRoom.get(sid);
-		// 得到对应类型病人的排队队列
+		// 得到对应类型科室的病人挂号队列
 		Queue<Patient> queue = map.get(ptype);
 		// 打印叫号前的挂号病人数量
-		System.out.println("叫号之前：" + queue.size());
+		System.out.println("叫号之前：" + String.valueOf(queue.size()));
 		// 从排队挂号的病人中取出下一个病人，即叫号
 		Patient patient = queue.poll();
 		// 打印叫号后的挂号病人数量
-		System.out.println("叫号之后：" + queue.size());
+		System.out.println("叫号之后：" + String.valueOf(queue.size()));
 		return patient;
 	}
 
