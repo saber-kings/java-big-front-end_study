@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			#chessboard {
+				width: 450px;
+				height: 450px;
+				background-image: url(img/chessboard/wood.jpg);
+				background-size: 100% 100%;
+				margin: 50px auto;
+			}
+
+			.chessblocks {
+				float: left;
+				width: 30px;
+				height: 30px;
+				background-image: url(img/chessboard/Ten.png);
+				background-size: 100% 100%;
+			}
+
+			.chessblocks-U {
+				background-image: url(img/chessboard/U.png);
+			}
+
+			.chessblocks-D {
+				background-image: url(img/chessboard/D.png);
+			}
+
+			.chessblocks-L {
+				background-image: url(img/chessboard/L.png);
+			}
+
+			.chessblocks-R {
+				background-image: url(img/chessboard/R.png);
+			}
+
+			.chessblocks-C {
+				background-image: url(img/chessboard/Center.png);
+			}
+
+			.chess {
+				width: 26px;
+				height: 26px;
+				margin-top: 2px;
+				margin-left: 2px;
+			}
+		</style>
+	</head>
+	<script>
+		var chessboard = new Array(15);
+		var w;
+		// 
+		var status;
+
+		function init() {
+			var roomId = window.localStorage.getItem("roomId");
+			var uid = window.localStorage.getItem("uid");
+			// w = new WebSocket("ws://192.168.31.139:8989/Gobang/room/" + roomId + "/" +uid);
+			// w.onopen = function() {
+			// 	var roomId = window.localStorage.getItem("roomId");
+			// 	console.log("房间号：" + roomId);
+			// 	if (roomId == null) {
+			// 		mui.alert("房间号不能为空, 不能加入房间",
+			// 			"提示",
+			// 			window.location.href = "index.html",
+			// 			"收到");
+			// 	}
+			// };
+			// w.onclose = function() {
+			// 	window.localStorage.removeItem("roomId");
+			// 	mui.alert("房间号不能为空, 不能加入房间",
+			// 		"提示",
+			// 		window.location.href = "index.html",
+			// 		"收到");
+			// };
+			// w.onmessage = function(event) {
+			// 	if (event.data==="isNull") {
+			// 		mui.alert("当前是空房间, 不能加入",
+			// 			"提示",
+			// 			window.location.href = "index.html",
+			// 			"收到");
+			// 	} else if (event.data==="full") {
+			// 		mui.alert("当前房间已满, 不能加入",
+			// 			"提示",
+			// 			window.location.href = "index.html",
+			// 			"收到");
+			// 	} else{
+
+			// 	}
+			// };
+
+			for (var i = 0; i < 15; i++) { //一维长度为15
+				chessboard[i] = new Array();
+				for (var j = 0; j < 15; j++) { //二维长度为15
+					chessboard[i][j] = "";
+					var str = "q" + i + "-" + j;
+					if (i === 0) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-U' onclick='playChess(" + i + "," + j + ");'></div>";
+					} else if (i === 14) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-D' onclick='playChess(" + i + "," + j + ")'></div>";
+					} else if (j === 0) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-L' onclick='playChess(" + i + "," + j + ")'></div>";
+					} else if (j === 14) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-R' onclick='playChess(" + i + "," + j + ")'></div>";
+					} else if (i === 7 && j === 7) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-C' onclick='playChess(" + i + "," + j + ")'></div>";
+					} else {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str + "' class='chessblocks' onclick='playChess(" + i +
+							"," + j + ")'></div>";
+					}
+				}
+			}
+			document.getElementById("q0-0").style.backgroundImage = "url(img/chessboard/LU.png)";
+			document.getElementById("q0-14").style.backgroundImage = "url(img/chessboard/RU.png)";
+			document.getElementById("q14-0").style.backgroundImage = "url(img/chessboard/LD.png)";
+			document.getElementById("q14-14").style.backgroundImage = "url(img/chessboard/RD.png)";
+
+		}
+
+		// 五子棋禁手判定算法
+		// chessboard当前棋盘数组, x纵坐标即行数, y横坐标即列数
+		// 其内8个角标分别对应：左上角，上方，右上角，右方，右下角，下方，左下角，左方，八个方向
+		function isBan(x, y) { 
+			// 数组下标代表方向
+			// 记录当前棋子相邻连续黑色棋子数
+			var adjsame = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 记录ajsname后相邻连续空位数
+			var adjempty = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 记录adjempty后的连续黑色棋子数
+			var jumpsame = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 记录jumpsame后的连续空位数
+			var jumpempty = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 记录jumpempty后的连续黑色棋子数
+			var jumpjumpsame = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 对待检测位置放入黑色棋子
+			chessboard[x][y] = "b";
+			
+			// 下面进行棋盘盘面的搜索
+			
+			var _x, _y;
+			
+			// 向左上搜索
+			for(_x=x-1,_y=y-1;_x>=0&&_y>=0&&chessboard[_x][_y]==="b";_x--,_y--){
+				adjsame[0]++;
+			}
+			for(;_x>=0&&_y>=0&&chessboard[_x][_y]==="";_x--,_y--){
+				adjempty[0]++;
+			}
+			for(;_x>=0&&_y>=0&&chessboard[_x][_y]==="b";_x--,_y--){
+				jumpsame[0]++;
+			}
+			for(;_x>=0&&_y>=0&&chessboard[_x][_y]==="";_x--,_y--){
+				jumpempty[0]++;
+			}
+			for(;_x>=0&&_y>=0&&chessboard[_x][_y]==="b";_x--,_y--){
+				jumpjumpsame[0]++;
+			}
+			
+			// 向上方搜索
+			for(_x=x-1;_x>=0&&chessboard[_x][y]==="b";_x--){
+				adjsame[1]++;
+			}
+			for(;_x>=0&&chessboard[_x][y]==="";_x--){
+				adjempty[1]++;
+			}
+			for(;_x>=0&&chessboard[_x][y]==="b";_x--){
+				jumpsame[1]++;
+			}
+			for(;_x>=0&&chessboard[_x][y]==="";_x--){
+				jumpempty[1]++;
+			}
+			for(;_x>=0&&chessboard[_x][y]==="b";_x--){
+				jumpjumpsame[1]++;
+			}
+
+			// 向右上方搜索
+			for(_x=x-1,_y=y+1;_x>=0&&_y<15&&chessboard[_x][_y]==="b";_x--,_y++){
+				adjsame[2]++;
+			}
+			for(;_x>=0&&_y<15&&chessboard[_x][_y]==="";_x--,_y++){
+				adjempty[2]++;
+			}
+			for(;_x>=0&&_y<15&&chessboard[_x][_y]==="b";_x--,_y++){
+				jumpsame[2]++;
+			}
+			for(;_x>=0&&_y<15&&chessboard[_x][_y]==="";_x--,_y++){
+				jumpempty[2]++;
+			}
+			for(;_x>=0&&_y<15&&chessboard[_x][_y]==="b";_x--,_y++){
+				jumpjumpsame[2]++;
+			}
+			
+			// 向右方搜索
+			for(_y=y+1;_y<15&&chessboard[x][_y]==="b";_y++){
+				adjsame[3]++;
+			}
+			for(;_y<15&&chessboard[x][_y]==="";_y++){
+				adjempty[3]++;
+			}
+			for(;_y<15&&chessboard[x][_y]==="b";_y++){
+				jumpsame[3]++;
+			}
+			for(;_y<15&&chessboard[x][_y]==="";_y++){
+				jumpempty[3]++;
+			}
+			for(;_y<15&&chessboard[x][_y]==="b";_y++){
+				jumpjumpsame[3]++;
+			}
+			
+			// 向右下方搜索
+			for(_x=x+1,_y=y+1;_x<15&&_y<15&&chessboard[_x][_y]==="b";_x++,_y++){
+				adjsame[4]++;
+			}
+			for(;_x<15&&_y<15&&chessboard[_x][_y]==="";_x++,_y++){
+				adjempty[4]++;
+			}
+			for(;_x<15&&_y<15&&chessboard[_x][_y]==="b";_x++,_y++){
+				jumpsame[4]++;
+			}
+			for(;_x<15&&_y<15&&chessboard[_x][_y]==="";_x++,_y++){
+				jumpempty[4]++;
+			}
+			for(;_x<15&&_y<15&&chessboard[_x][_y]==="b";_x++,_y++){
+				jumpjumpsame[4]++;
+			}
+			
+			// 向下方搜索
+			for(_x=x+1;_x<15&&chessboard[_x][y]==="b";_x++){
+				adjsame[5]++;
+			}
+			for(;_x<15&&chessboard[_x][y]==="";_x++){
+				adjempty[5]++;
+			}
+			for(;_x<15&&chessboard[_x][y]==="b";_x++){
+				jumpsame[5]++;
+			}
+			for(;_x<15&&chessboard[_x][y]==="";_x++){
+				jumpempty[5]++;
+			}
+			for(;_x<15&&chessboard[_x][y]==="b";_x++){
+				jumpjumpsame[5]++;
+			}
+			
+			// 向左下方搜索
+			for(_x=x+1,_y=y-1;_x<15&&_y>=0&&chessboard[_x][_y]==="b";_x++,_y--){
+				adjsame[6]++;
+			}
+			for(;_x<15&&_y>=0&&chessboard[_x][_y]==="";_x++,_y--){
+				adjempty[6]++;
+			}
+			for(;_x<15&&_y>=0&&chessboard[_x][_y]==="b";_x++,_y--){
+				jumpsame[6]++;
+			}
+			for(;_x<15&&_y>=0&&chessboard[_x][_y]==="";_x++,_y--){
+				jumpempty[6]++;
+			}
+			for(;_x<15&&_y>=0&&chessboard[_x][_y]==="b";_x++,_y--){
+				jumpjumpsame[6]++;
+			}
+			
+			// 向左方搜索
+			for(_y=y-1;_y>=0&&chessboard[x][_y]==="b";_y--){
+				adjsame[7]++;
+			}
+			for(;_y>=0&&chessboard[x][_y]==="";_y--){
+				adjempty[7]++;
+			}
+			for(;_y>=0&&chessboard[x][_y]==="b";_y--){
+				jumpsame[7]++;
+			}
+			for(;_y>=0&&chessboard[x][_y]==="";_y--){
+				jumpempty[7]++;
+			}
+			for(;_y>=0&&chessboard[x][_y]==="b";_y--){
+				jumpjumpsame[7]++;
+			}
+			// console.log(adjsame);
+			// console.log(adjempty);
+			// console.log(jumpsame);
+			// console.log(jumpempty);
+			// console.log(jumpjumpsame);
+			
+			// 搜索结束
+			
+			// 搜索完毕将棋盘还原
+			chessboard[x][y] = "";
+			
+			// 先检查是否成连五，若成连五，黑棋获胜，不构成禁手。
+			for(var i =0;i<4;i++){
+				if (adjsame[i]+adjsame[i+4]===4) {
+					// 设置黑棋赢了的状态
+					// status = "b_win";
+					return "no_ban";
+				}
+			}
+			
+			// 禁手分析
+			var threecount = 0, fourcount = 0; // 活三，活四棋型统计
+			
+			for (var i = 0; i < 4; i++) {
+				// 五字以上相连
+				if (adjsame[i]+adjsame[i+4]>=5) {
+					return "long_ban"; // 长连禁手
+				} else if (adjsame[i]+adjsame[i+4]===3) { // 四子相连 011110，以下0代表无，1代表黑，+代表要下的位置
+					// 活四冲四判断
+					var isFour = false;
+					if (adjempty[i]>0) { //0+11110
+						// 通过递归判断关键点是否可下
+						if (keyPointIsBan(x,y,adjsame[i],i)==="no_ban") {
+							isFour = true;
+						}
+					}
+					
+					if (adjempty[i+4]>0) { //01111+0
+						if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+							isFour = true;
+						}
+					}
+					
+					if(isFour) {
+						fourcount++;
+					}
+				} else if (adjsame[i]+adjsame[i+4]===2) { // 三子相连 01110
+					// 活四冲四检查
+					if (adjempty[i]===1&&jumpsame[i]===1) { //01+1110
+						if (keyPointIsBan(x,y,adjsame[i],i)==="no_ban") {
+							fourcount++;
+						}
+					}
+					
+					if (adjempty[i+4]===1&&jumpsame[i+4]===1) { //0111+10
+						if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+							fourcount++;
+						}
+					}
+					
+					// 活三检查
+					var isThree = false;
+					
+					//0++111+0
+					if ((adjempty[i]>2||adjempty[i]===2&&jumpsame[i]===0)&&
+						(adjempty[i+4]>1||adjempty[i+4]===1&&jumpsame[i+4]===0)) {
+						if (keyPointIsBan(x,y,adjsame[i],i)==="no_ban") {
+							isThree = true;
+						}
+					}
+					
+					//0+111++0
+					if ((adjempty[i+4]>2||adjempty[i+4]===2&&jumpsame[i+4]===0)&&
+						(adjempty[i]>1||adjempty[i]===1&&jumpsame[i]===0)) {
+						if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+							isThree = true;
+						}
+					}
+					
+					if(isThree) {
+						threecount++;
+					}
+				} else if (adjsame[i]+adjsame[i+4]===1) { // 两子相连 0110
+					// 活四冲四判断
+					if (adjempty[i]===1&&jumpsame[i]===2) { //011+110
+						if (keyPointIsBan(x,y,adjsame[i],i)==="no_ban") {
+							fourcount++;
+						}
+					}
+					
+					if (adjempty[i+4]===1&&jumpsame[i+4]===2) { //011+110
+						if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+							fourcount++;
+						}
+					}
+					
+					// 活三判断
+					//0+1+11+0
+					if (adjempty[i]===1&&jumpsame[i]===2&&(jumpempty[i]>1||jumpempty[i]===1&&jumpjumpsame[i]===0)&&
+						(adjempty[i+4]>1||adjempty[i+4]===1&&jumpsame[i+4]===0)) {
+						if (keyPointIsBan(x,y,adjsame[i],i)==="no_ban") {
+							threecount++;
+						}
+					}
+					
+					//0+11+1+0
+					if (adjempty[i+4]===1&&jumpsame[i+4]===2&&(jumpempty[i+4]>1||jumpempty[i+4]===1&&jumpjumpsame[i+4]===0)
+						&&(adjempty[i]>1||adjempty[i]===1&&jumpsame[i]===0)) {
+						if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+							threecount++;
+						}
+					}
+				} else if (adjsame[i]+adjsame[i+4]===0) { // 单独一子 010
+					// 活四冲四判断
+					if (adjempty[i]===1&&jumpsame[i]===3) { //0111+10
+						if (keyPointIsBan(x,y,adjsame[i],[i])==="no_ban") {
+							fourcount++;
+						}
+					}
+					
+					if (adjempty[i+4]===1&&jumpsame[i+4]===3) { //1+111
+						if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+							fourcount++;
+						}
+					}
+					
+					// 活三判断
+					//0+11+1+0
+					if (adjempty[i]===1&&jumpsame[i]===2&&(jumpempty[i]>1||jumpempty[i]===1&&jumpjumpsame[i]===0)&&
+						(adjempty[i+4]>1||adjempty[i+4]===1&&jumpsame[i+4]===0)) {
+						if (keyPointIsBan(x,y,adjsame[i],i)==="no_ban") {
+							threecount++;
+						}
+					}
+					
+					//0+1+11+0
+					if (adjempty[i+4]===1&&jumpsame[i+4]===2&&(jumpempty[i+4]>1||jumpempty[i+4]===1&&
+						jumpjumpsame[i+4]===0)&&(adjempty[i]>1||adjempty[i]===1&&jumpsame[i]===0)) {
+						if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+							threecount++;
+						}
+					}
+					
+				}
+			}
+			
+			// 禁手分析结束
+			if (fourcount>1) {
+				return "4_4_ban"; // 形成一个以上的活四、冲四，四四禁手
+			}
+			if (threecount>1) {
+				return "3_3_ban"; // 形成一个以上的活三、冲三，三三禁手
+			}
+			
+			return "no_ban";
+		}
+		
+		// 判断是否构成活三、活四或冲四的关键点是否构成禁手点，并返回结果
+		// chessboard当前棋盘数组, x纵坐标即行数, y横坐标即列数
+		// adjsame是待判断禁手点与关键点相隔的点数, direction是关键点相对禁手点的方向（8个）
+		// 其内4个数分别对应：左上到右下方向，竖直方向，右上到左下方向，水平方向，四个方向
+		function keyPointIsBan(x,y,adjsame,direction){
+			var i, j; // 关键点坐标
+			adjsame++;
+			if (direction>=4) {
+				adjsame = -adjsame;
+			}
+			
+			// 计算关键点坐标
+			switch(direction%4) {
+				case 1:
+					i = x - adjsame;
+					j = y;
+					break;
+				case 2:
+					i = x - adjsame;
+					j = y + adjsame;
+					break;
+				case 3:
+					i = x;
+					j = y + adjsame;
+					break;
+				default:
+					i = x + adjsame;
+					j = y + adjsame;
+					break;
+			}
+			
+			// 向棋盘中放入棋子
+			chessboard[x][y] = "b";
+			chessboard[i][j] = "b";
+			
+			// 检查关键点
+			var result = isBan(i,j);
+			
+			// 还原棋盘
+			chessboard[i][j] = "";
+			chessboard[x][y] = "";
+			
+			return result;
+		}
+
+		// 判断白棋是否赢了的方法
+		// chessboard当前棋盘数组, x纵坐标即行数, y横坐标即列数
+		// 其内8个角标分别对应：左上角，上方，右上角，右方，右下角，下方，左下角，左方，八个方向
+		function win(x, y, color){
+			// 数组下标代表方向
+			// 记录当前棋子相邻连续同色棋子数
+			var adjsame = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 对待检测位置放入该颜色棋子
+			chessboard[x][y] = color;
+			
+			// 下面进行棋盘盘面的搜索
+			var _x, _y;
+			// 向左上搜索
+			for(_x=x-1,_y=y-1;_x>=0&&_y>=0&&chessboard[_x][_y]===color;_x--,_y--,adjsame[0]++);
+			// 向上方搜索
+			for(_x=x-1;_x>=0&&chessboard[_x][y]===color;_x--,adjsame[1]++);
+			// 向右上方搜索
+			for(_x=x-1,_y=y+1;_x>=0&&_y<15&&chessboard[_x][_y]===color;_x--,_y++,adjsame[2]++);
+			// 向右方搜索
+			for(_y=y+1;_y<15&&chessboard[x][_y]===color;_y++,adjsame[3]++);
+			// 向右下方搜索
+			for(_x=x+1,_y=y+1;_x<15&&_y<15&&chessboard[_x][_y]===color;_x++,_y++,adjsame[4]++);
+			// 向下方搜索
+			for(_x=x+1;_x<15&&chessboard[_x][y]===color;_x++,adjsame[5]++);
+			// 向左下方搜索
+			for(_x=x+1,_y=y-1;_x<15&&_y>=0&&chessboard[_x][_y]===color;_x++,_y--,adjsame[6]++);
+			// 向左方搜索
+			for(_y=y-1;_y>=0&&chessboard[x][_y]===color;_y--,adjsame[7]++);
+			// console.log(adjsame);
+			
+			// 搜索结束
+			
+			// 检查是否成连五及以上，若成连五及以上，则获胜。
+			for(var i =0;i<4;i++){
+				if (adjsame[i]+adjsame[i+4]===4) {
+					// 设置该棋子赢了的状态
+					status = color + "_win";
+				}
+			}
+		}
+
+		function playChess(i, j) {
+			if (chessboard[i][j] === "") {
+				console.log("落子位置：" + i + "," + j);
+				// 若黑棋落子，判断黑棋状态
+				var bStatus = isBan(i, j);
+				// 如果是禁手
+				if (bStatus!=="no_ban") {
+					// 设置白棋赢了的状态
+					status = "w_win";
+				}
+				// 否则继续落子，判断黑棋是否赢了
+				win(i, j, "b");
+				chessboard[i][j] = "b";
+				var str = "q" + i + "-" + j;
+				document.getElementById(str).innerHTML = "<img src='img/chessboard/light_black.png' class='chess' />";
+				// 若白棋落子，判断白棋是否赢了
+				// win(i, j, "w");
+				// chessboard[i][j] = "w";
+				// var str = "q" + i + "-" + j;
+				// document.getElementById(str).innerHTML = "<img src='img/chessboard/light_white.png' class='chess' />";
+				if (status === "b_win") {
+					alert("黑棋赢了");
+					// document.getElementById("chessboard").innerHTML = "";
+					// status = "";
+					// init();
+				} else if (status === "w_win") {
+					alert("白棋赢了");
+					// document.getElementById("chessboard").innerHTML = "";
+					// status = "";
+					// init();
+				}
+			}
+		}
+	</script>
+	<body onload="init();">
+		<div style="float: left;width: 20%;">
+			玩家1
+		</div>
+		<div style="float: left;width: 60%;">
+			<div id="chessboard">
+				
+				
+			</div>
+		</div>
+		
+		<div style="float: left;width: 20%;">
+			玩家2
+		</div>
+	</body>
+</html>

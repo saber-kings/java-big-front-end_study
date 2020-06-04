@@ -1,0 +1,212 @@
+/* header start */
+h1, h2, h3, h4, h5, h6{
+	margin: 0;
+}
+/* .fenye{
+	width: 200%;
+	height: 100%;
+}
+#offCanvasWrapper{
+	width: 50%;
+	float: left;
+} */
+header{
+	height: 100%;
+	background-color: #31c27d;
+	position: relative;
+}
+.home{
+	text-align: center;
+	padding-top: 0.25rem;
+	color: #fff;
+	font-size: 0.15rem;
+	font-weight: 500;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-60%);
+}
+.mulu{
+	color: #fff;
+	margin-top: 0.22rem;
+	margin-left: 0.1rem;
+}
+.mui-icon-bars,.mui-icon-search{
+	font-size: 0.2rem;
+	padding: 0!important;
+}
+.mulu:active,.search:active{
+	color: #007aff;
+}
+.search{
+	color: #fff;
+	margin-top: 0.22rem;
+	margin-right: 0.07rem;
+}
+
+/* 搜索框 */
+.mui-input-row{
+	margin-top: 0.1rem;
+	display: none;
+}
+.mui-bar input[type=search]{
+	background-color: #fbfbfb;
+	height: 0.2rem;
+	font-size: 0.1rem;
+}
+.mui-input-row span{
+	font-size: 0.08rem;
+}
+.mui-search .mui-placeholder .mui-icon{
+	font-size: 0.1rem;
+	margin-right: 0.1rem;
+}
+.mui-search .mui-placeholder{
+	font-size: 0.1rem;
+	line-height: 0.1rem;
+	height: 0.2rem;
+	margin-top: 0.08rem;
+}
+
+.mui-bar-nav{
+	height: 0.5rem;
+	background-color: #31c27d;
+	position: relative;
+}
+header span.mui-icon{
+	color: #fff;
+}
+
+.mui-bar .mui-icon{
+	font-size: 0.15rem;
+}
+.mui-icon.mui-icon-search{
+	font-size: 0.2rem;
+}
+/* header end */
+.mui-bar-nav~.mui-content{
+	padding-top: 0.5rem;
+}
+/* 选项卡 */
+.mui-control-item.mui-active{
+	border-bottom: 2px solid #31c27d !important;
+	color: #31c27d !important;
+	font-size: .13rem;
+	padding-bottom: 0.1rem;
+}
+.mui-segmented-control .mui-control-item{
+	overflow: initial;
+}
+.mui-segmented-control {
+	font-size: .13rem;
+	padding: 0.1rem 0 0;
+}
+.content-title{
+	background-color: #fbfbfb;
+}
+/* 选项卡内容 */
+.mui-control-content .list-box{
+	
+}
+.mui-control-content ul.list{
+	width: 90%;
+	background-color: rgba(255,255,255,0.3);
+	box-shadow: 0 0 0.08rem 0.05rem #ddd;
+	margin: .1rem auto;
+	
+}
+.mui-control-content ul.list li{
+	/* height: 0.7rem; */
+	height: 100%;
+	width: 90%;
+	margin: 5px auto;
+	border-bottom: 2px solid #ccc;
+}
+.mui-control-content ul.list li:last-of-type{
+	border-bottom: none;
+}
+.mui-control-content ul.list li img{
+	margin: .1rem 0;
+	border-radius: 10px;
+	width: 20%;
+}
+.mui-control-content ul.list li .right{
+	margin-left: 5%;
+	margin-top: .08rem;
+	width: 70%;
+}
+.mui-control-content ul.list li .right p{
+	font-size: 0.14rem;
+	line-height: 0.2rem;
+	color: #000000;
+	text-indent: 0;
+	margin-bottom: 0;
+}
+.mui-control-content ul.list li .right p.author{
+	font-size: 0.12rem;
+	color: #888;
+	margin-top: 0.05rem;
+}
+#app{
+	padding-bottom:0.4rem ;
+}
+/* 底部播放器 */
+.bottom{
+	position: fixed;
+	bottom: 0;
+	left: 50%;
+	z-index: 99;
+	width: 100%;
+	height: 0.4rem;
+	background-color: rgba(255,255,255,.7);
+	transform: translateX(-50%);
+}
+.bottom .icon{
+	margin-top:0.08rem ;
+}
+.bottom .icon2{
+	margin-top: 0.06rem;
+	margin-right: 0.3rem;
+}
+.bottom .icon img{
+	width: 0.2rem;
+	height: 0.2rem;
+	background-color: #000000;
+}
+.bottom .icon span{
+	font-size: 0.2rem;
+	color: #31c27d;
+	padding: 0.02rem;
+	margin-right: 0.1rem;
+	border-radius: 0.05rem;
+}
+.control{
+	color: #31c27d;
+	font-size: 0.15rem;
+	padding: 0.02rem;
+	padding-top: 0.05;
+}
+.song-box{
+	font-size: 0.16rem;
+	line-height: 0.4rem;
+	margin-left: 3.5%;
+	width: 60%;
+	color: #333;
+	font-family:楷体;
+}
+.icon-box{
+	width: 35%;
+}
+#paly{
+	display: block;
+}
+
+#pause{
+	display: none;
+}
+.fa-play{
+	padding: 0.05rem;
+}
+.fa-pause{
+	padding: 0.05rem;
+}

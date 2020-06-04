@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<script src="js/vue.min.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+			//获取原始窗口的高度
+			var originalHeight = document.documentElement.clientHeight || document.body.clientHeight;
+
+			window.onresize = function() {
+				//软键盘弹起与隐藏  都会引起窗口的高度发生变化
+				var resizeHeight = document.documentElement.clientHeight || document.body.clientHeight;
+				if (resizeHeight * 1 < originalHeight * 1) { //resizeHeight<originalHeight证明窗口被挤压了
+					plus.webview.currentWebview().setStyle({
+						height: originalHeight
+					});
+				}
+			}
+		</script>
+		<style type="text/css">
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+				overflow: auto;
+				background-image: url(img/bg.png);
+				background-size: 100% 100%;
+				/*图片宽高完全自适应窗口尺寸*/
+				/* background-size: cover; */
+				/*图片宽高自适应窗口尺寸但有些情况下只有一个能自适应而另一个无法达到*/
+				/* border-radius：超出上限或下限效果跟上下限效果一样 */
+			}
+
+			.login-content {
+				width: 100%;
+				height: 100%;
+				background-image: url(img/sakura2.gif);
+				background-size: 100% 100%;
+				position: fixed;
+			}
+
+			[v-cloak] {
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app" class="login-content" v-cloak>
+			<div style="width: 60%;text-align: center;margin: 50px auto;">
+				<div id="sliderSegmentedControl" class="mui-segmented-control mui-segmented-control-inverted" style="width: 80%;margin: 0 auto;">
+					<div class="titleList" style="font-size: 22px;">
+						<a class="mui-control-item paddingNone mui-active " href="#item1mobile" data-id="0">
+							<strong>验证码登陆</strong>
+						</a>
+						<a class="mui-control-item paddingNone" href="#item2mobile" data-id="1">
+							<strong>密码登陆</strong>
+						</a>
+					</div>
+				</div>
+				<div id="itemMobile" class="mui-content-padded" style="width: 80%;margin: 0 auto;margin-top: 10px;">
+					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+						请输入中国手机号
+						<div style="margin-top: 5px;">
+							<span style="font-size: 25px;font-size: 25px;position: relative;top: 5px;">+86</span><input type="tel"
+							 placeholder="请输入您的手机号" v-model="phone" style="margin-left: 5%;width: 80%;border-top: none;border-left: none;border-right: none;background-color: transparent;border-bottom: solid 1px #000000;border-radius: 0;" />
+						</div>
+						<div style="width: 80%;margin: 0 auto;margin-top: 5px;height: 42px;line-height: 42px;background-color: #007AFF;border-radius: 25px;text-align: center;color: white;font-size: 20px;cursor: pointer;"
+						 @click="plogin();">
+							登&emsp;录
+						</div>
+						<div style="width: 80%;margin: 0 auto;margin-top: 10px;font-size: 10px;min-height: 42px;text-align: center;">
+							<img src="img/hy.png" style="width: 15px;float: left;margin-top: 2px;">
+							<div style="margin-left: 5px;float: left;max-width: 90%;">
+								未注册的用户登录时将自动创建账号，且代表您已经同意<span style="color: red;">《用户协议》</span>和<span style="color: red;">《隐私协议》</span>
+							</div>
+						</div>
+					</div>
+					<div id="item2mobile" class="mui-slider-item mui-control-content">
+						请输入注册的手机号
+						<div style="margin-top: 5px;">
+							<span style="font-size: 25px;font-size: 25px;position: relative;top: 5px;">+86</span><input type="tel"
+							 placeholder="请输入您的手机号" v-model="phone" style="margin-left: 5%;width: 80%;border-top: none;border-left: none;border-right: none;background-color: transparent;border-bottom: solid 1px #000000;border-radius: 0;" />
+						</div>
+						<div style="margin-top: 5px;">
+							<img src="img/password.png" style="width: 30px;margin: 0 5px;position: relative;top: 6px;"><input type="password"
+							 placeholder="请输入您的密码" v-model="upwd" style="margin-left: 5%;width: 80%;border-top: none;border-left: none;border-right: none;background-color: transparent;border-bottom: solid 1px #000000;border-radius: 0;" />
+						</div>
+						<div style="width: 80%;margin: 0 auto;margin-top: 5px;height: 42px;line-height: 42px;background-color: #007AFF;border-radius: 25px;text-align: center;color: white;font-size: 20px;cursor: pointer;"
+						 @click="mlogin();">
+							登&emsp;录
+						</div>
+						<div style="width: 80%;margin: 10px auto;margin-bottom: 0;">
+							<a href="javascript:void(0);" style="float: left;">用户注册</a>
+							<a href="javascript:void(0);" style="float: right;">忘记密码</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
+			var app1 = new Vue({
+				el: "#app",
+				data: {
+					phone: "",
+					upwd: ""
+				},
+				created: function() {
+					this.autoJump();
+				},
+				methods: {
+					autoJump() {
+						//判断是否已登录
+						var id = window.localStorage.getItem("uid");
+						if (id != null) {
+							window.location.href = "index.html";
+						}
+					},
+					plogin() {
+						if (this.phone == null || this.phone == "") {
+							mui.toast('请输入手机号', {
+								duration: 'long',
+								type: 'div'
+							});
+						} else if (!(/^1[3456789]\d{9}$/.test(this.phone))) {
+							mui.toast('手机号有误，请重填', {
+								duration: 'long',
+								type: 'div'
+							});
+						} else {
+							mui.ajax("http://192.168.31.139:8989/Gobang/getCaptcha", {
+								// data: {
+								// 	phone: app1.phone;
+								// },
+								dataType: 'json', //服务器返回json格式数据
+								type: 'get', //HTTP请求类型
+								timeout: 10000, //超时时间设置为10秒；
+								success: function(data) {
+									alert(data.code);
+
+									window.localStorage.setItem("code", data.code);
+									window.location.href = "captcha.html";
+								},
+								error: function(xhr, type, errorThrown) {
+									//异常处理；
+									mui.alert(type, "错误", "确定", ()=>{}, "div");
+								}
+							});
+						}
+					},
+					mlogin() {
+						if (this.phone == null || this.phone == "") {
+							mui.toast('请输入手机号', {
+								duration: 'long',
+								type: 'div'
+							});
+						} else if (!(/^1[3456789]\d{9}$/.test(this.phone))) {
+							mui.toast('手机号有误，请重填', {
+								duration: 'long',
+								type: 'div'
+							});
+						} else if (this.upwd == "") {
+							mui.toast('请输入密码', {
+								duration: 'long',
+								type: 'div'
+							});
+						} else {
+							mui.ajax("http://192.168.31.139:8989/Gobang/mlogin?phone=" + this.phone + "&upwd=" + this.upwd, {
+								// data: {
+								// 	phone: app1.phone;
+								// },
+								dataType: 'json', //服务器返回json格式数据
+								type: 'get', //HTTP请求类型
+								timeout: 10000, //超时时间设置为10秒；
+								success: function(data) {
+									if (data.msg == "error") {
+										mui.alert("登陆失败", "错误", "确定", ()=>{}, "div");
+									} else if (data.msg == "logined") {
+										mui.alert("用户已登录", "提示", "确定", ()=>{}, "div");
+									} else {
+										window.localStorage.setItem("uid", data.id);
+										window.localStorage.setItem("newcomer", Boolean(data.newcomer));
+										window.location.href = "index.html";
+										// alert(data.realName);
+									}
+								},
+								error: function(xhr, type, errorThrown) {
+									//异常处理；
+									mui.alert(type, "错误", "确定", ()=>{}, "div");
+								}
+							});
+						}
+					}
+				}
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,36 @@
+.singer{
+    .van-index-bar{
+        .van-index-anchor{
+            padding: 0 0;
+            .van-card__header{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .van-card__content{
+                    display: flex;
+                        justify-content: center;
+                    p{
+                        // margin-left: 3vw;
+                        font-size: 4vw;
+                    }
+                }
+                
+            }
+            .van-image{
+                .van-image__img{
+                    width: 17vw;
+                }
+            }
+            .van-card{
+                padding: 0px 16px;
+                border-bottom: 1px solid #999;
+            }
+            
+          }
+    }
+}
+
+
+
+
+

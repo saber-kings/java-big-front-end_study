@@ -1,0 +1,423 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>音乐播放器</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="css/reset.css">
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet"/>
+		<script src="js/vue.min.js"></script>
+		<link rel="stylesheet" href="css/bofang.css" />
+		<link rel="stylesheet" href="css/mobile.css">
+		<script src="js/common.js"></script>
+		<script src="js/jquery-1.11.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			mui.init();
+		</script>
+	</head>
+
+	<body>
+		<div id="app">
+			<div id="body">
+				<!-- <a href=""><</a> -->
+				<a><span class="mui-icon mui-icon-arrowleft"  id="prev"></span></a>
+				<div class="main" v-for="(item,index) in musicList" :key="index" v-show="item.isShow">
+					<div class="top">
+						<h3>{{item.title}}</h3>
+						<p class="author">{{item.txtname}}<span @click="item.focuState=!item.focuState" :class="item.focuState?'active ac':'ac'">{{item.focuState?'已关注':'+关注'}}<img src="images/heart.png"/ v-show="item.focuState"></span></p>
+					</div>
+					<div class="geci">
+						<div class="box">
+							<div class="mid">
+							<ul class="info">
+								<li v-for="key in item.messageList">
+									<span >{{key.name}}</span>
+								</li>
+								<audio :src="item.audioSrc" @timeupdate="audioClick(index)"></audio>
+							</ul>
+							</div>
+						</div>
+					</div>
+					<div class="jindu">
+						<div class="proBar">
+							<div class="bar clearfix">
+								<span class="fl">{{newstarTime}}</span>
+								<div class="barTwig fl">
+									<div class="barRate" :style="{'width':widthStyle}"></div>
+									<div class="barBall" id="ball" @touchstart="X" @touchmove="X2" @touchend="X3"></div>
+								</div>
+								<span class="fr time_two" id="newT">{{newtoalTime}}</span>
+							</div>
+						</div>
+						<div class="clear"></div>
+					</div> 
+					<div class="btnGroup">
+						<img src="images/ljiantou.png" @click="addClick" />
+						<img :src="btnState ?'images/over.png':'images/open.png'" @touchstart="changeClick" />
+						<img src="images/rjiantou.png" @click="reduceClick" />
+						<div class="clear"></div>
+					</div><div class="clear"></div>
+				</div>					
+				
+			</div>
+		</div>
+	</body>
+	<script>
+		mui.init({
+			
+		    //监听Android手机的back、menu按键 
+		    keyEventBind: { 
+			  backbutton: false,  //Boolean(默认true)关闭back按键监听 
+			  menubutton: false   //Boolean(默认true)关闭menu按键监听 
+		    }, 
+		});
+		var app = new Vue({
+			el: "#app",
+			data() {
+				return {
+					musicList: [
+						{
+						title: '下山 (改编版)',
+						txtname: '小熊纯一郎 ',
+						messageList: [
+							{ time: "[00:00.00]", name: "小熊纯一郎 - 下山 (改编版)" },
+							{ time: "[00:13.33]", name: "要想寒假轻松过冬" },
+							{ time: "[00:15.33]", name: "先要忍受磨人期末考的痛" },
+							{ time: "[00:18.41]", name: "平时上课不认真玩世不恭" },
+							{ time: "[00:21.38]", name: "考试前脑子空空" },
+							{ time: "[00:25.02]", name: "每天是彻夜地用功" },
+							{ time: "[00:27.05]", name: "希望在最后几周突击成功" },
+							{ time: "[00:30.10]", name: "放假回家的我 玩耍的我" },
+							{ time: "[00:33.41]", name: "叫一个快活" },
+							{ time: "[00:36.49]", name: "我左手柯南挂窗前" },
+							{ time: "[00:39.26]", name: "右手贝多芬箴言" },
+							{ time: "[00:42.20]", name: "早上背诵知识点" },
+							{ time: "[00:45.15]", name: "晚上习题卷" },
+							{ time: "[00:47.74]", name: "我忍辱负重为明天" },
+							{ time: "[00:50.97]", name: "抱佛脚为及格线" },
+							{ time: "[00:53.90]", name: "切记要日行一善" },
+							{ time: "[00:56.83]", name: "比方说三连" },
+							{ time: "[01:11.68]", name: "我左手柯南挂窗前" },
+							{ time: "[01:14.36]", name: "右手贝多芬箴言" },
+							{ time: "[01:17.27]", name: "早上背诵知识点" },
+							{ time: "[01:20.18]", name: "晚上习题卷" },
+							{ time: "[01:22.82]", name: "我忍辱负重为明天" },
+							{ time: "[01:26.09]", name: "抱佛脚为及格线" },
+							{ time: "[01:29.00]", name: "切记要日行一善" },
+							{ time: "[01:31.91]", name: "比方说三连" }],
+						isShow: true,
+						audioSrc: 'xs.mp3',
+						focuState:true,
+					}],
+					list:[],
+					bigList:[],
+					musicIndex: 0,
+					btnState: false,
+					newtoalTime: 0,
+					newstarTime: 0,
+					startTime: 0,
+					endTimer: 0,
+					widthStyle: 0,
+					timeList: [],
+					itemIndex: 0,
+					heightNum: 0,
+					k:0,
+					ids:[],//装歌曲id
+					x:0,//偏移量
+				}
+			},
+			mounted: function() {
+				
+				$('.main').css('height',window.screen.height)
+				this.newtoalTime = '0:00';
+				this.newstarTime = '0:00';
+				if(this.btnState==true){
+					localStorage.setItem('paly',true);
+				}else{
+					localStorage.setItem('paly',false);
+				}
+				//this.k=localStorage.getItem('i');
+				var that=this;
+				window.addEventListener('newsId',function(event){
+				  if(event.detail.id!=undefined){
+					  var id = event.detail.id;
+					  $('audio')[0].pause();
+					  // that.timeList = [];
+					  that.btnState=false;
+					  that.k=id;
+					  that.ids=localStorage.getItem('ids').split(',');
+					  that.req(that.k,that.ids);
+					  $('audio')[0].currentTime=0;
+					  setTimeout(function(){
+					  	that.changeClick()
+					  },500)
+				  }
+				  if(event.detail.auto!=undefined){
+					  console.log('play');
+					  that.btnState=true;
+					  $('audio')[0].play();
+				  }
+				  if(event.detail.pause!=undefined){
+					  console.log('pause');
+					  that.btnState=false;
+					  $('audio')[0].pause();
+				  }
+				  
+				});
+				$('#prev').on('tap',function(){
+					mui.plusReady(function(){
+					var prev=plus.webview.getLaunchWebview();
+					mui.fire(prev,'backIndexPage',{str:that.btnState,song:that.musicList[0].title});
+					mui.back();
+					
+					})
+				})
+			},
+			beforeUpdata(){
+				
+			},
+			
+			methods: {
+				/*focusClick(index){
+					if(this.musicList[this.musicIndex].isShow){
+						this.musicList[this.musicIndex].focuState=!this.musicList[this.musicIndex].focuState
+					}
+				},*/
+				req(k,ids){
+					let first=ids[k];
+					var that=this;	
+						$.ajax({
+							type:"post",
+							url:"http://music.taihe.com/data/music/fmlink?rate=320&songIds="+first+"&type=&callback=cb_download&_t=1468380564513&format=json",
+							data:'',
+							dataType:"jsonp",
+							success:function(z){
+								that.musicList[0].title=z.data.songList[0].songName;
+								that.musicList[0].txtname=z.data.songList[0].artistName;
+								that.musicList[0].audioSrc=z.data.songList[0].songLink;
+								var w=z.data.songList[0].lrcLink;
+								// 判断lrc文件
+								if(w.substr(-3)=="lrc"){
+									htmlobj=$.ajax({url:z.data.songList[0].lrcLink,async:false});
+									var geci=htmlobj.responseText;
+									arr=geci.split(/\n/);
+									that.musicList[0].messageList=[];
+									for(var i=0;i<arr.length;i++){
+										arr_er=arr[i].split(']')
+										if(arr_er[1]!=''){
+											that.musicList[0].messageList.push({time:arr_er[0]+']',name:arr_er[1]})
+										}
+									}
+								}else{
+									that.musicList[0].messageList=[{time: "[00:00.00]", name: "无歌词" }];
+								}
+							},
+						})
+						// console.log(that.musicList[0].messageList) 
+				},
+				X(e){
+					// console.log(1);
+					$('audio')[0].pause();
+				},
+				X2(e){
+					if(e.touches[0].pageX<$('.barTwig')[0].clientWidth&&e.touches[0].pageX>0){
+						$('#ball').css('left',e.touches[0].pageX);
+						this.widthStyle=e.touches[0].pageX+'px';
+						$('.barRate').css('background','#58b2dc');
+						this.x=e.touches[0].pageX;
+					}else{
+						return;
+					}
+				},
+				X3(e){
+					// console.log(this.x);
+					$('audio')[0].currentTime=this.x*$('audio')[0].duration/$('.barTwig')[0].clientWidth;
+					this.btnState=true;
+					$('audio')[0].play();
+					
+				},
+				
+				addClick(){
+					if(this.ids!=''){
+						$('audio')[0].pause();
+						this.btnState=false;
+						if(this.k>0){
+							this.k--;
+						}
+						if(this.k==0){
+							this.k=this.ids.length-1
+						}
+						this.req(this.k,this.ids);
+						$('audio')[0].currentTime=0;
+						var that=this;
+						setTimeout(function(){
+							that.changeClick()
+						},800)
+					}
+				},
+				reduceClick() {
+					if(this.ids!=''){
+						$('audio')[0].pause();
+						this.btnState=false;
+						if(this.k<this.ids.length){
+							this.k++;
+							
+						}
+						if(this.k==this.ids.length){
+							this.k=0;
+						}
+						this.req(this.k,this.ids);
+						$('audio')[0].currentTime=0;
+						var that=this;
+						setTimeout(function(){
+							that.changeClick()
+						},800)
+					}
+				},
+				changeClick() {
+					var aAuto = document.getElementsByTagName('audio');
+					var aInfo = document.getElementsByClassName('info');
+					this.btnState = !this.btnState;
+					
+					if(this.btnState==true) {
+						
+						//var TimeRages=$('audio')[0].buffered;
+						//var timeBuffered=TimeRages.end(TimeRages.length-1);
+						//console.log(timeBuffered)
+						//var bufferPercent=timeBuffered/$('audio')[0].duration;
+						//console.log(bufferPercent.toFixed(2))
+						var audio=$('audio')[0];
+						console.log(audio.readyState)
+						//console.log(Math.round(audio.buffered / audio.duration * 100) + '%')
+						//audio.readyState == 4 && (percent = Math.round(audio.buffered / audio.duration * 100) + '%')
+						var that=this;
+						if(audio.readyState==4){
+							that.timeList = [];
+							that.btnState=true;
+							audio.play();
+							that.audioClick();
+							if(that.musicList[that.musicIndex].messageList.length>1){
+								for(var i in that.musicList[that.musicIndex].messageList) {
+									that.timeList.push(parseFloat((that.musicList[that.musicIndex].messageList[i].time).substr(1, 3)) * 60 + parseFloat((that.musicList[that.musicIndex].messageList[i].time).substr(4, 9)))
+								}
+							}
+						}else{
+							that.btnState=false;
+						}
+						
+					} else {
+						aAuto[this.musicIndex].pause();
+					}
+				},
+				
+				audioClick() {
+					var aAuto = document.getElementsByTagName('audio');
+					var aitemNum = document.getElementsByClassName('barRate');
+					var aBall = document.getElementsByClassName('barBall');
+					var aInfo = document.getElementsByClassName('info');
+					var aLi = aInfo[this.musicIndex].getElementsByTagName('li');
+					var oBody = document.getElementById('body');
+					var aItems = oBody.getElementsByTagName('li');
+					this.startTime = Math.round(aAuto[this.musicIndex].currentTime);
+					if((this.startTime / 60) < 1) {
+						if(this.startTime < 10) {
+							this.newstarTime = 0 + ':' + '0' + this.startTime
+						} else {
+							this.newstarTime = 0 + ':' + this.startTime
+						}
+					} else {
+						if(this.startTime % 60 < 10) {
+							this.newstarTime = parseInt(this.startTime / 60) + ':' + '0' + this.startTime % 60
+						} else {
+							this.newstarTime = parseInt(this.startTime / 60) + ':' + this.startTime % 60
+						}
+					}
+					this.endTimer = Math.round(aAuto[this.musicIndex].duration)
+					if((this.endTimer % 60) < 10) {
+						this.newtoalTime = parseInt(this.endTimer / 60) + ':' + '0' + Math.round(this.endTimer % 60)
+					} else {
+						this.newtoalTime = parseInt(this.endTimer / 60) + ':' + Math.round(this.endTimer % 60)
+					}
+					
+					this.widthStyle = ((aAuto[this.musicIndex].currentTime) / (aAuto[this.musicIndex].duration)).toFixed(2) * 100 + '%';
+					aBall[this.musicIndex].style.left = this.widthStyle;
+					aitemNum[this.musicIndex].style.height = '100%';
+					aitemNum[this.musicIndex].style.background = '#58b2dc';
+					if(parseInt(this.widthStyle) == 100) {
+						this.btnState = false;
+					}
+					if(this.musicList[0].messageList[0].name!="无歌词"&&this.timeList.length>1){
+					for(var i = 0; i < this.timeList.length; i++) {
+						aLi[i].className = '';
+						if(this.startTime > this.timeList[i] && this.startTime < this.timeList[i + 1]) {
+							this.itemIndex = i;
+							this.heightNum = -20 * this.itemIndex;
+							aLi[this.itemIndex].className = 'on';
+							aInfo[this.musicIndex].style.top = this.heightNum*0.01+'rem';
+							if(aInfo[this.musicIndex].offsetHeight-Math.abs(this.heightNum)<=318){
+								this.heightNum=-(aInfo[this.musicIndex].offsetHeight-318)
+								aInfo[this.musicIndex].style.top = this.heightNum*0.01+'rem';
+							}
+						}
+						if(this.startTime > (this.timeList[this.timeList.length - 2] + 2) && this.startTime < (this.endTimer - 1)) {
+							aLi[this.timeList.length - 1].className = 'on';
+							aLi[this.timeList.length - 2].className = '';
+						}
+					}}else{
+						aInfo[this.musicIndex].style.top=0+'px';
+						aLi[0].className = '';
+						this.timeList=[];
+					}
+					if(this.startTime == this.endTimer) {
+						// this.btnState=true;
+						// aAuto[this.musicIndex].pause();
+						// this.timeList = [];
+						// aAuto[this.musicIndex].currentTime = 0;
+						// this.newstarTime = '0:00';
+						// for(var t = 0; t < aItems.length; t++) {
+						// 	aItems[t].className = ''
+						// }
+						// for(var s=0;s<aInfo.length;s++){
+						// 	aInfo[s].style.top=0+'rem'
+						// }
+						// if(this.k<this.ids.length){
+						// 	this.k++;
+							
+						// }
+						// if(this.k==this.ids.length){
+						// 	this.k=0;
+						// }
+						// this.req(this.k,this.ids);
+						if(this.ids!=''){
+							$('audio')[0].pause();
+							this.btnState=false;
+							if(this.k<this.ids.length){
+								this.k++;
+								
+							}
+							if(this.k==this.ids.length){
+								this.k=0; 
+							}
+							this.req(this.k,this.ids);
+							$('audio')[0].currentTime=0;
+							var that=this;
+							setTimeout(function(){
+								that.changeClick()
+							},800)
+						}
+					}
+				}
+			},
+			created(){
+				
+			},
+		})
+		
+		
+		
+	</script>
+
+</html>

@@ -1,0 +1,27 @@
+.singer .van-index-bar .van-index-anchor {
+  padding: 0 0;
+}
+
+.singer .van-index-bar .van-index-anchor .van-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.singer .van-index-bar .van-index-anchor .van-card__header .van-card__content {
+  display: flex;
+  justify-content: center;
+}
+
+.singer .van-index-bar .van-index-anchor .van-card__header .van-card__content p {
+  font-size: 4vw;
+}
+
+.singer .van-index-bar .van-index-anchor .van-image .van-image__img {
+  width: 17vw;
+}
+
+.singer .van-index-bar .van-index-anchor .van-card {
+  padding: 0px 16px;
+  border-bottom: 1px solid #999;
+}

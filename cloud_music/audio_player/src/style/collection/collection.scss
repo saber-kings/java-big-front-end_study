@@ -1,0 +1,75 @@
+.bc {
+    width: 100%;
+    height: 100%;
+    // background-color: red;
+    .top-btn {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        height: 12vw;
+        background-color: #d44439;
+        
+        .arrow-left {
+            position: absolute;
+            top: 1vw;
+            padding: 2.5vw 0 0 3vw;
+            z-index: 222;
+        }
+        .van-tabs{
+            background-color: #eee;
+            
+            
+            
+            .van-tabs__content{
+                .van-tab__pane{
+                    .broad-all{
+                        display: flex;
+                        align-items: center;
+                        height: 11vw;
+                        font-size: 6vw;
+                        border-bottom: 1px solid #999;
+                        i{
+                            margin-left: 6vw;
+                            font-size: 25px;
+                            flex: 1;
+                        }
+                        span{
+                            flex:10
+                        }
+                    }
+                }
+
+            }
+        }
+        // .top-title{
+        //     position: absolute;
+        //     left: 25%;
+        //     overflow: auto;
+        //     text-align: center;
+        //     color: #fff;
+            
+        //     .top-collection{
+        //         float: left;
+        //         width: 30vw;
+        //         height: 10vw;
+        //         line-height: 12vw;
+               
+        //         span{
+        //             font-size: 4vw;
+        //             border-bottom: 2px solid #fff;
+        //         }
+        //     }
+        //     .top-broadcast{
+        //         float: left;
+        //         width: 30vw;
+        //         height: 10vw;
+        //         line-height: 12vw;
+        //         font-size: 4vw;
+        //         span{
+        //             font-size: 4vw;
+        //             border-bottom: 2px solid #fff;
+        //         }
+        //     }
+        // }
+    }
+}

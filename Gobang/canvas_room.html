@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style type="text/css">
+			canvas {
+				display: block;
+				margin: 50px auto;
+				background-image: url(img/chessboard/wood.jpg);
+				box-shadow: -2px -2px 2px #F3F2F2, 5px 5px 5px #6F6767;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="450px" height="450px"></canvas>
+		<script type="text/javascript">
+			var chess = document.getElementById("mycanvas");
+			var context = chess.getContext('2d');
+			var me = true;
+			var chessBox = []; //用于存放棋盘中落子的情况
+			for (var i = 0; i < 15; i++) {
+				chessBox[i] = [];
+				for (var j = 0; j < 15; j++) {
+					chessBox[i][j] = 0; //初始值为0
+				}
+			}
+
+			function drawChessBoard() {
+				for (var i = 0; i < 15; i++) {
+					context.strokeStyle = "#000";
+					//垂直方向画15根线，相距30px;
+					context.moveTo(15 + i * 30, 15);
+					context.lineTo(15 + i * 30, 435);
+					context.stroke();
+					//水平方向画15根线，相距30px;
+					//棋盘为14*14;
+					context.moveTo(15, 15 + i * 30);
+					context.lineTo(435, 15 + i * 30);
+					context.stroke();
+				}
+				
+			}
+			
+			// 初始化棋盘关键点
+			function initKeyPoint(){
+				// 起始一条路径，或重置当前路径
+				context.beginPath();
+				// 绘制天元中心点
+				var center = context.arc(15 + 7 * 30, 15 + 7 * 30, 5, 0, 2 * Math.PI); 
+				// 绘制左上角点
+				var lu = context.arc(15 + 3 * 30, 15 + 3 * 30, 5, 0, 2 * Math.PI); 
+				// 绘制右下角点
+				var lr = context.arc(15 + 11 * 30, 15 + 11 * 30, 5, 0, 2 * Math.PI); 
+				// 设置点的颜色
+				context.fillStyle = "#0A0A0A";
+				// 填充当前绘图（路径）
+				context.fill();
+				// 创建从当前点回到起始点的路径。
+				context.closePath();
+				// 重新起始一条路径，或重置当前路径，因为不这样的画会导致在同一横纵坐标上的点与中心点形成三角形
+				context.beginPath();
+				// 绘制右下角点
+				var lu = context.arc(15 + 3 * 30, 15 + 11 * 30, 5, 0, 2 * Math.PI); 
+				// 绘制左下角点
+				var lu = context.arc(15 + 11 * 30, 15 + 3 * 30, 5, 0, 2 * Math.PI);
+				// 设置点的颜色
+				context.fillStyle = "#0A0A0A";
+				// 填充当前绘图（路径）
+				context.fill();
+				// 创建从当前点回到起始点的路径。
+				context.closePath();
+			}
+			//绘制棋盘
+			drawChessBoard(); 
+			initKeyPoint();
+			
+			// 落子方法
+			function oneStep(i, j, k) {
+				context.beginPath();
+				context.arc(15 + i * 30, 15 + j * 30, 13, 0, 2 * Math.PI); //绘制棋子
+				//设置渐变
+				var g = context.createRadialGradient(15 + i * 30, 15 + j * 30, 13, 15 + i * 30, 15 + j * 30, 0); 
+				if (k) { //k=true是黑棋，否则是白棋
+					g.addColorStop(0, '#0A0A0A'); //黑棋
+					g.addColorStop(1, '#636766');
+				} else {
+					g.addColorStop(0, '#D1D1D1'); //白棋
+					g.addColorStop(1, '#F9F9F9');
+				}
+				context.fillStyle = g;
+				context.fill();
+				context.closePath();
+			}
+			// 棋盘点击事件
+			chess.onclick = function(e) {
+				var x = e.offsetX; //相对于棋盘左上角的x坐标
+				var y = e.offsetY; //相对于棋盘左上角的y坐标
+				var i = Math.floor(x / 30);
+				var j = Math.floor(y / 30);
+				if (chessBox[i][j] == 0) {
+					oneStep(i, j, me);
+					if (me) {
+						chessBox[i][j] = 1;
+					} else {
+						chessBox[i][j] = 2;
+					}
+					me = !me; //下一步白棋
+				}
+			}
+		</script>
+
+	</body>
+</html>

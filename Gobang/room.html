@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			* {
+				margin: 0px;
+				padding: 0px;
+				border: 0px;
+			}
+
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+				background-image: url(img/main1.jpg);
+				background-size: 100% 100%;
+			}
+
+			.my-p {
+				color: white;
+				font-weight: 700;
+			}
+
+			.profile-left-top {
+				width: 80%;
+				height: 40px;
+				margin-top: 5px;
+				margin-left: 5px;
+				float: left;
+			}
+
+			.profile-right-top {
+				width: 80%;
+				height: 40px;
+				margin-top: 5px;
+				margin-left: 5px;
+				float: right;
+				overflow: hidden;
+			}
+
+			.profile-avatar {
+				border-radius: 5px;
+				width: 40px;
+				height: 40px;
+				float: left;
+			}
+
+			.profile-nickname {
+				float: left;
+				margin-left: 2px;
+				height: 40px;
+				font-size: small;
+			}
+
+			#chessboard {
+				width: 300px;
+				height: 300px;
+				background-image: url(img/chessboard/wood.jpg);
+				background-size: 100% 100%;
+				margin: 7.5% auto;
+				margin-bottom: 0;
+			}
+
+			.chessblocks {
+				float: left;
+				width: 20px;
+				height: 20px;
+				background-image: url(img/chessboard/Ten.png);
+				background-size: 100% 100%;
+			}
+
+			.chessblocks-U {
+				background-image: url(img/chessboard/U.png);
+			}
+
+			.chessblocks-D {
+				background-image: url(img/chessboard/D.png);
+			}
+
+			.chessblocks-L {
+				background-image: url(img/chessboard/L.png);
+			}
+
+			.chessblocks-R {
+				background-image: url(img/chessboard/R.png);
+			}
+
+			.chessblocks-C {
+				background-image: url(img/chessboard/Center.png);
+			}
+
+			.chess {
+				width: 16px;
+				height: 16px;
+				margin-top: 2px;
+				margin-left: 2px;
+			}
+
+			[v-cloak] {
+				display: none;
+			}
+		</style>
+		<script src="js/vue.min.js"></script>
+		<script src="js/axios.min.js"></script>
+	</head>
+	<script type="text/javascript" charset="utf-8">
+		mui.init();
+		//获取原始窗口的高度
+		var originalHeight = document.documentElement.clientHeight || document.body.clientHeight;
+
+		window.onresize = function() {
+			//软键盘弹起与隐藏  都会引起窗口的高度发生变化
+			var resizeHeight = document.documentElement.clientHeight || document.body.clientHeight;
+			if (resizeHeight * 1 < originalHeight * 1) { //resizeHeight<originalHeight证明窗口被挤压了
+				plus.webview.currentWebview().setStyle({
+					height: originalHeight
+				});
+			}
+		}
+	</script>
+	<script>
+		var chessboard = new Array(15);
+		// 输赢状态
+		var status = "";
+		// 计时器
+		var time = 0;
+		// 当前落子的横坐标
+		var currentX;
+		// 当前落子的纵坐标
+		var currentY;
+
+		function initChessBoard() {
+			for (var i = 0; i < 15; i++) { //一维长度为15
+				chessboard[i] = new Array();
+				for (var j = 0; j < 15; j++) { //二维长度为15
+					chessboard[i][j] = "";
+					var str = "q" + i + "-" + j;
+					if (i === 0) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-U' onclick='playChess(" + i + "," + j + "," + null + ")'></div>";
+					} else if (i === 14) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-D' onclick='playChess(" + i + "," + j + "," + null + ")'></div>";
+					} else if (j === 0) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-L' onclick='playChess(" + i + "," + j + "," + null + ")'></div>";
+					} else if (j === 14) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-R' onclick='playChess(" + i + "," + j + "," + null + ")'></div>";
+					} else if (i === 7 && j === 7) {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks chessblocks-C' onclick='playChess(" + i + "," + j + "," + null + ")'></div>";
+					} else {
+						document.getElementById("chessboard").innerHTML += "<div id='" + str +
+							"' class='chessblocks' onclick='playChess(" + i +
+							"," + j + "," + null + ")'></div>";
+					}
+				}
+			}
+			document.getElementById("q0-0").style.backgroundImage = "url(img/chessboard/LU.png)";
+			document.getElementById("q0-14").style.backgroundImage = "url(img/chessboard/RU.png)";
+			document.getElementById("q14-0").style.backgroundImage = "url(img/chessboard/LD.png)";
+			document.getElementById("q14-14").style.backgroundImage = "url(img/chessboard/RD.png)";
+		}
+
+		// function init() {
+		// 	initWebSocket();
+		// 	initChessBoard();
+		// }
+
+		// 五子棋禁手判定算法
+		// chessboard当前棋盘数组, x纵坐标即行数, y横坐标即列数
+		// 其内8个角标分别对应：左上角，上方，右上角，右方，右下角，下方，左下角，左方，八个方向
+		function isBan(x, y) {
+			// 数组下标代表方向
+			// 记录当前棋子相邻连续黑色棋子数
+			var adjsame = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 记录ajsname后相邻连续空位数
+			var adjempty = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 记录adjempty后的连续黑色棋子数
+			var jumpsame = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 记录jumpsame后的连续空位数
+			var jumpempty = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 记录jumpempty后的连续黑色棋子数
+			var jumpjumpsame = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 对待检测位置放入黑色棋子
+			chessboard[x][y] = "b";
+
+			// 下面进行棋盘盘面的搜索
+
+			var _x, _y;
+
+			// 向左上搜索
+			for (_x = x - 1, _y = y - 1; _x >= 0 && _y >= 0 && chessboard[_x][_y] === "b"; _x--, _y--) {
+				adjsame[0]++;
+			}
+			for (; _x >= 0 && _y >= 0 && chessboard[_x][_y] === ""; _x--, _y--) {
+				adjempty[0]++;
+			}
+			for (; _x >= 0 && _y >= 0 && chessboard[_x][_y] === "b"; _x--, _y--) {
+				jumpsame[0]++;
+			}
+			for (; _x >= 0 && _y >= 0 && chessboard[_x][_y] === ""; _x--, _y--) {
+				jumpempty[0]++;
+			}
+			for (; _x >= 0 && _y >= 0 && chessboard[_x][_y] === "b"; _x--, _y--) {
+				jumpjumpsame[0]++;
+			}
+
+			// 向上方搜索
+			for (_x = x - 1; _x >= 0 && chessboard[_x][y] === "b"; _x--) {
+				adjsame[1]++;
+			}
+			for (; _x >= 0 && chessboard[_x][y] === ""; _x--) {
+				adjempty[1]++;
+			}
+			for (; _x >= 0 && chessboard[_x][y] === "b"; _x--) {
+				jumpsame[1]++;
+			}
+			for (; _x >= 0 && chessboard[_x][y] === ""; _x--) {
+				jumpempty[1]++;
+			}
+			for (; _x >= 0 && chessboard[_x][y] === "b"; _x--) {
+				jumpjumpsame[1]++;
+			}
+
+			// 向右上方搜索
+			for (_x = x - 1, _y = y + 1; _x >= 0 && _y < 15 && chessboard[_x][_y] === "b"; _x--, _y++) {
+				adjsame[2]++;
+			}
+			for (; _x >= 0 && _y < 15 && chessboard[_x][_y] === ""; _x--, _y++) {
+				adjempty[2]++;
+			}
+			for (; _x >= 0 && _y < 15 && chessboard[_x][_y] === "b"; _x--, _y++) {
+				jumpsame[2]++;
+			}
+			for (; _x >= 0 && _y < 15 && chessboard[_x][_y] === ""; _x--, _y++) {
+				jumpempty[2]++;
+			}
+			for (; _x >= 0 && _y < 15 && chessboard[_x][_y] === "b"; _x--, _y++) {
+				jumpjumpsame[2]++;
+			}
+
+			// 向右方搜索
+			for (_y = y + 1; _y < 15 && chessboard[x][_y] === "b"; _y++) {
+				adjsame[3]++;
+			}
+			for (; _y < 15 && chessboard[x][_y] === ""; _y++) {
+				adjempty[3]++;
+			}
+			for (; _y < 15 && chessboard[x][_y] === "b"; _y++) {
+				jumpsame[3]++;
+			}
+			for (; _y < 15 && chessboard[x][_y] === ""; _y++) {
+				jumpempty[3]++;
+			}
+			for (; _y < 15 && chessboard[x][_y] === "b"; _y++) {
+				jumpjumpsame[3]++;
+			}
+
+			// 向右下方搜索
+			for (_x = x + 1, _y = y + 1; _x < 15 && _y < 15 && chessboard[_x][_y] === "b"; _x++, _y++) {
+				adjsame[4]++;
+			}
+			for (; _x < 15 && _y < 15 && chessboard[_x][_y] === ""; _x++, _y++) {
+				adjempty[4]++;
+			}
+			for (; _x < 15 && _y < 15 && chessboard[_x][_y] === "b"; _x++, _y++) {
+				jumpsame[4]++;
+			}
+			for (; _x < 15 && _y < 15 && chessboard[_x][_y] === ""; _x++, _y++) {
+				jumpempty[4]++;
+			}
+			for (; _x < 15 && _y < 15 && chessboard[_x][_y] === "b"; _x++, _y++) {
+				jumpjumpsame[4]++;
+			}
+
+			// 向下方搜索
+			for (_x = x + 1; _x < 15 && chessboard[_x][y] === "b"; _x++) {
+				adjsame[5]++;
+			}
+			for (; _x < 15 && chessboard[_x][y] === ""; _x++) {
+				adjempty[5]++;
+			}
+			for (; _x < 15 && chessboard[_x][y] === "b"; _x++) {
+				jumpsame[5]++;
+			}
+			for (; _x < 15 && chessboard[_x][y] === ""; _x++) {
+				jumpempty[5]++;
+			}
+			for (; _x < 15 && chessboard[_x][y] === "b"; _x++) {
+				jumpjumpsame[5]++;
+			}
+
+			// 向左下方搜索
+			for (_x = x + 1, _y = y - 1; _x < 15 && _y >= 0 && chessboard[_x][_y] === "b"; _x++, _y--) {
+				adjsame[6]++;
+			}
+			for (; _x < 15 && _y >= 0 && chessboard[_x][_y] === ""; _x++, _y--) {
+				adjempty[6]++;
+			}
+			for (; _x < 15 && _y >= 0 && chessboard[_x][_y] === "b"; _x++, _y--) {
+				jumpsame[6]++;
+			}
+			for (; _x < 15 && _y >= 0 && chessboard[_x][_y] === ""; _x++, _y--) {
+				jumpempty[6]++;
+			}
+			for (; _x < 15 && _y >= 0 && chessboard[_x][_y] === "b"; _x++, _y--) {
+				jumpjumpsame[6]++;
+			}
+
+			// 向左方搜索
+			for (_y = y - 1; _y >= 0 && chessboard[x][_y] === "b"; _y--) {
+				adjsame[7]++;
+			}
+			for (; _y >= 0 && chessboard[x][_y] === ""; _y--) {
+				adjempty[7]++;
+			}
+			for (; _y >= 0 && chessboard[x][_y] === "b"; _y--) {
+				jumpsame[7]++;
+			}
+			for (; _y >= 0 && chessboard[x][_y] === ""; _y--) {
+				jumpempty[7]++;
+			}
+			for (; _y >= 0 && chessboard[x][_y] === "b"; _y--) {
+				jumpjumpsame[7]++;
+			}
+			// console.log(adjsame);
+			// console.log(adjempty);
+			// console.log(jumpsame);
+			// console.log(jumpempty);
+			// console.log(jumpjumpsame);
+
+			// 搜索结束
+
+			// 搜索完毕将棋盘还原
+			chessboard[x][y] = "";
+
+			// 先检查是否成连五，若成连五，黑棋获胜，不构成禁手。
+			for (var i = 0; i < 4; i++) {
+				if (adjsame[i] + adjsame[i + 4] === 4) {
+					// 设置黑棋赢了的状态
+					status = "b_win";
+					return "no_ban";
+				}
+			}
+
+			// 禁手分析
+			var threecount = 0,
+				fourcount = 0; // 活三，活四棋型统计
+
+			for (var i = 0; i < 4; i++) {
+				// 五子以上相连
+				if (adjsame[i] + adjsame[i + 4] >= 5) {
+					return "long_ban"; // 长连禁手
+				}
+				// else if (adjsame[i]+adjsame[i+4]===3) { // 四子相连 011110，以下0代表无，1代表黑，+代表要下的位置
+				// 	// 活四冲四判断
+				// 	var isFour = false;
+				// 	if (adjempty[i]>0) { //0+11110
+				// 		// 通过递归判断关键点是否可下
+				// 		if (keyPointIsBan(x,y,adjsame[i],i)==="no_ban") {
+				// 			isFour = true;
+				// 		}
+				// 	}
+
+				// 	if (adjempty[i+4]>0) { //01111+0
+				// 		if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+				// 			isFour = true;
+				// 		}
+				// 	}
+
+				// 	if(isFour) {
+				// 		fourcount++;
+				// 	}
+				// } 
+				else if (adjsame[i] + adjsame[i + 4] === 2) { // 三子相连 01110
+					// 活四冲四检查
+					// if (adjempty[i]===1&&jumpsame[i]===1) { //01+1110
+					// 	if (keyPointIsBan(x,y,adjsame[i],i)==="no_ban") {
+					// 		fourcount++;
+					// 	}
+					// }
+
+					// if (adjempty[i+4]===1&&jumpsame[i+4]===1) { //0111+10
+					// 	if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+					// 		fourcount++;
+					// 	}
+					// }
+
+					// 活三检查
+					var isThree = false;
+
+					//0++111+0
+					if ((adjempty[i] > 2 || adjempty[i] === 2 && jumpsame[i] === 0) &&
+						(adjempty[i + 4] > 1 || adjempty[i + 4] === 1 && jumpsame[i + 4] === 0)) {
+						if (keyPointIsBan(x, y, adjsame[i], i) === "no_ban") {
+							isThree = true;
+						}
+					}
+
+					//0+111++0
+					if ((adjempty[i + 4] > 2 || adjempty[i + 4] === 2 && jumpsame[i + 4] === 0) &&
+						(adjempty[i] > 1 || adjempty[i] === 1 && jumpsame[i] === 0)) {
+						if (keyPointIsBan(x, y, adjsame[i + 4], i + 4) === "no_ban") {
+							isThree = true;
+						}
+					}
+
+					if (isThree) {
+						threecount++;
+					}
+				} else if (adjsame[i] + adjsame[i + 4] === 1) { // 两子相连 0110
+					// // 活四冲四判断
+					// if (adjempty[i]===1&&jumpsame[i]===2) { //011+110
+					// 	if (keyPointIsBan(x,y,adjsame[i],i)==="no_ban") {
+					// 		fourcount++;
+					// 	}
+					// }
+
+					// if (adjempty[i+4]===1&&jumpsame[i+4]===2) { //011+110
+					// 	if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+					// 		fourcount++;
+					// 	}
+					// }
+
+					// 活三判断
+					//0+1+11+0
+					if (adjempty[i] === 1 && jumpsame[i] === 2 && (jumpempty[i] > 1 || jumpempty[i] === 1 && jumpjumpsame[i] === 0) &&
+						(adjempty[i + 4] > 1 || adjempty[i + 4] === 1 && jumpsame[i + 4] === 0)) {
+						if (keyPointIsBan(x, y, adjsame[i], i) === "no_ban") {
+							threecount++;
+						}
+					}
+
+					//0+11+1+0
+					if (adjempty[i + 4] === 1 && jumpsame[i + 4] === 2 && (jumpempty[i + 4] > 1 || jumpempty[i + 4] === 1 &&
+							jumpjumpsame[i + 4] === 0) &&
+						(adjempty[i] > 1 || adjempty[i] === 1 && jumpsame[i] === 0)) {
+						if (keyPointIsBan(x, y, adjsame[i + 4], i + 4) === "no_ban") {
+							threecount++;
+						}
+					}
+				} else if (adjsame[i] + adjsame[i + 4] === 0) { // 单独一子 010
+					// 活四冲四判断
+					// if (adjempty[i]===1&&jumpsame[i]===3) { //0111+10
+					// 	if (keyPointIsBan(x,y,adjsame[i],[i])==="no_ban") {
+					// 		fourcount++;
+					// 	}
+					// }
+
+					// if (adjempty[i+4]===1&&jumpsame[i+4]===3) { //1+111
+					// 	if (keyPointIsBan(x,y,adjsame[i+4],i+4)==="no_ban") {
+					// 		fourcount++;
+					// 	}
+					// }
+
+					// 活三判断
+					//0+11+1+0
+					if (adjempty[i] === 1 && jumpsame[i] === 2 && (jumpempty[i] > 1 || jumpempty[i] === 1 && jumpjumpsame[i] === 0) &&
+						(adjempty[i + 4] > 1 || adjempty[i + 4] === 1 && jumpsame[i + 4] === 0)) {
+						if (keyPointIsBan(x, y, adjsame[i], i) === "no_ban") {
+							threecount++;
+						}
+					}
+
+					//0+1+11+0
+					if (adjempty[i + 4] === 1 && jumpsame[i + 4] === 2 && (jumpempty[i + 4] > 1 || jumpempty[i + 4] === 1 &&
+							jumpjumpsame[i + 4] === 0) && (adjempty[i] > 1 || adjempty[i] === 1 && jumpsame[i] === 0)) {
+						if (keyPointIsBan(x, y, adjsame[i + 4], i + 4) === "no_ban") {
+							threecount++;
+						}
+					}
+
+				}
+			}
+
+			// 禁手分析结束
+			// if (fourcount>1) {
+			// 	return "4_4_ban"; // 形成一个以上的活四、冲四，四四禁手
+			// }
+			if (threecount > 1) {
+				return "3_3_ban"; // 形成一个以上的活三、冲三，三三禁手
+			}
+
+			return "no_ban";
+		}
+
+		// 判断是否构成活三、活四或冲四的关键点是否构成禁手点，并返回结果
+		// chessboard当前棋盘数组, x纵坐标即行数, y横坐标即列数
+		// adjsame是待判断禁手点与关键点相隔的点数, direction是关键点相对禁手点的方向（8个）
+		// 其内4个数分别对应：左上到右下方向，竖直方向，右上到左下方向，水平方向，四个方向
+		function keyPointIsBan(x, y, adjsame, direction) {
+			var i, j; // 关键点坐标
+			adjsame++;
+			if (direction >= 4) {
+				adjsame = -adjsame;
+			}
+
+			// 计算关键点坐标
+			switch (direction % 4) {
+				case 1:
+					i = x - adjsame;
+					j = y;
+					break;
+				case 2:
+					i = x - adjsame;
+					j = y + adjsame;
+					break;
+				case 3:
+					i = x;
+					j = y + adjsame;
+					break;
+				default:
+					i = x + adjsame;
+					j = y + adjsame;
+					break;
+			}
+
+			// 向棋盘中放入棋子
+			chessboard[x][y] = "b";
+			chessboard[i][j] = "b";
+
+			// 检查关键点
+			var result = isBan(i, j);
+
+			// 还原棋盘
+			chessboard[i][j] = "";
+			chessboard[x][y] = "";
+
+			return result;
+		}
+
+		// 判断白棋是否赢了的方法
+		// chessboard当前棋盘数组, x纵坐标即行数, y横坐标即列数
+		// 其内8个角标分别对应：左上角，上方，右上角，右方，右下角，下方，左下角，左方，八个方向
+		function win(x, y) {
+			// 数组下标代表方向
+			// 记录当前棋子相邻连续同色棋子数
+			var adjsame = [0, 0, 0, 0, 0, 0, 0, 0];
+			// 对待检测位置放入白色棋子
+			chessboard[x][y] = "w";
+
+			// 下面进行棋盘盘面的搜索
+			var _x, _y;
+			// 向左上搜索
+			for (_x = x - 1, _y = y - 1; _x >= 0 && _y >= 0 && chessboard[_x][_y] === "w"; _x--, _y--, adjsame[0]++);
+			// 向上方搜索
+			for (_x = x - 1; _x >= 0 && chessboard[_x][y] === "w"; _x--, adjsame[1]++);
+			// 向右上方搜索
+			for (_x = x - 1, _y = y + 1; _x >= 0 && _y < 15 && chessboard[_x][_y] === "w"; _x--, _y++, adjsame[2]++);
+			// 向右方搜索
+			for (_y = y + 1; _y < 15 && chessboard[x][_y] === "w"; _y++, adjsame[3]++);
+			// 向右下方搜索
+			for (_x = x + 1, _y = y + 1; _x < 15 && _y < 15 && chessboard[_x][_y] === "w"; _x++, _y++, adjsame[4]++);
+			// 向下方搜索
+			for (_x = x + 1; _x < 15 && chessboard[_x][y] === "w"; _x++, adjsame[5]++);
+			// 向左下方搜索
+			for (_x = x + 1, _y = y - 1; _x < 15 && _y >= 0 && chessboard[_x][_y] === "w"; _x++, _y--, adjsame[6]++);
+			// 向左方搜索
+			for (_y = y - 1; _y >= 0 && chessboard[x][_y] === "w"; _y--, adjsame[7]++);
+			// console.log(adjsame);
+
+			// 搜索结束
+
+			// 检查是否成连五及以上，若成连五及以上，则获胜。
+			for (var i = 0; i < 4; i++) {
+				if (adjsame[i] + adjsame[i + 4] === 4) {
+					// 设置白棋赢了的状态
+					status = "w" + "_win";
+				}
+			}
+		}
+
+		var currentStep = 0;
+
+		function playChess(i, j, turn) {
+			if (chessboard[i][j] === "") {
+				if (app.rightPlayer!=null) {
+					if (app.leftPlayer.reday===1&&app.rightPlayer.reday===1) {
+						if (turn == null) {
+							console.log(currentStep);
+							if (app.turn==="b"&&currentStep===0&&i!==7&&j!==7){
+									mui.alert("黑棋首子必须落在天元",
+										"提示",
+										"明白了",
+										()=>{},
+										'div');
+								}
+							} else {
+								app.req.code = 5;
+								app.req.x = i;
+								app.req.y = j;
+								app.req.turn = app.turn;
+								app.ws.send(JSON.stringify(app.req));
+								currentX = i;
+								currentY = j;
+								app.isTimming(time, false);
+							}
+						}
+						if (turn === "b") {
+							// 若黑棋落子，判断黑棋状态
+							var bStatus = isBan(i, j);
+							// 如果是禁手
+							if (bStatus !== "no_ban") {
+								// 设置白棋赢了的状态
+								status = "w_win";
+							}
+							// 否则继续落子
+							chessboard[i][j] = "b";
+							var str = "q" + i + "-" + j;
+							document.getElementById(str).innerHTML = "<img src='img/chessboard/light_black.png' class='chess' />";
+							currentStep++;
+						}
+						if (turn === "w") {
+							// 若白棋落子，判断白棋是否赢了
+							win(i, j, "w");
+							chessboard[i][j] = "w";
+							var str = "q" + i + "-" + j;
+							document.getElementById(str).innerHTML = "<img src='img/chessboard/light_white.png' class='chess' />";
+							currentStep++;
+						}
+						if (status === "b_win") {
+							app.req.code = 7;
+							app.req.res = status;
+							app.ws.send(JSON.stringify(app.req));
+						} else if (status === "w_win") {
+							app.req.code = 7;
+							app.req.res = status;
+							app.ws.send(JSON.stringify(app.req));
+						}
+					} else{
+						mui.alert("必须双方都准备了之后才能落子", "提示", "收到", () => {}, 'div');
+					}
+				} else{
+					mui.alert("目前没有玩家进入，不能落子", "提示", "收到", () => {}, 'div');
+				}
+			}
+		}
+	</script>
+	<body>
+		<div id="app">
+			<div style="float: left;width: 20%;">
+				<div class="profile-left-top">
+					<img :src="leftPlayer.avatar" class="profile-avatar" v-cloak>
+					<div class="profile-nickname">
+						<div style="margin-top: 5px;height: 15px;">
+							<p class="my-p">昵称</p>
+						</div>
+						<div style="margin-top: 0;">
+							<p style="color: #F0AD4E;" v-cloak>{{subStr(leftPlayer.nickName)}}</p>
+						</div>
+					</div>
+				</div>
+				<div style="width: 80%;height: 40px;margin-left: 5px;" v-cloak>
+					<p>
+						胜率:&nbsp;{{leftPlayer.totalGames===0?'100%':leftPlayer.winGames/leftPlayer.totalGames + '%'}}<br>
+						状态:&nbsp;<span id="leftReday">未准备</span>
+					</p>
+				</div>
+				<div style="width: 80%;height: 40px;margin-left: 5px;margin-top: 50px;" v-cloak>
+					<button type="button" id="redayBtn" v-show="redayBtn" class="mui-btn mui-btn-success mui-pull-left"
+					 @click="reday()">
+						准备
+					</button>
+					<button type="button" v-show="firstChangeBtn" class="mui-btn mui-btn-primary mui-pull-left"
+					 @click="firstChange()">
+						先手交换
+					</button>
+					<button type="button" v-show="regretBtn" class="mui-btn mui-btn-warning mui-pull-left"
+					 @click="regretChess()">
+						悔棋
+					</button>
+				</div>
+			</div>
+			<div style="float: left;width: 60%;">
+				<div id="chessboard" v-cloak>
+
+
+				</div>
+			</div>
+
+			<div style="float: left;width: 20%;" v-if="rightPlayer!=null" v-cloak>
+				<div class="profile-right-top">
+					<div class="profile-nickname">
+						<div style="margin-top: 5px;height: 15px;">
+							<p class="my-p">昵称</p>
+						</div>
+						<div style="margin-top: 0;">
+							<p style="color: #F0AD4E;" v-cloak>{{rightPlayer!=null?subStr(rightPlayer.nickName):''}}</p>
+						</div>
+					</div>
+					<img :src="rightPlayer!=null?rightPlayer.avatar:'#'" class="profile-avatar" v-cloak>
+				</div>
+				<div style="width: 80%;height: 40px;margin-left: 5px;float: right;" v-cloak>
+					<p>
+						胜率:&nbsp;{{rightPlayer.totalGames===0?'100%':rightPlayer.winGames/rightPlayer.totalGames + '%'}}<br>
+						状态:&nbsp;<span id="rightReday">未准备</span>
+					</p>
+				</div>
+			</div>
+		</div>
+		<script>
+			var httpServerPrefix = "http://192.168.31.139:8989/Gobang/";
+			var app = new Vue({
+				el: "#app",
+				data: {
+					rid: "",
+					uid: "",
+					ws: {},
+					redayBtn: false,
+					regretBtn: false,
+					firstChangeBtn: false,
+					req: {
+						code: null,
+						reday: 0,
+						guess: 0,
+						res: "",
+						x: null,
+						y: null
+					},
+					resp: {
+						code: null,
+						msg: "",
+						enemy: "",
+						turn: "",
+						x: null,
+						y: null
+					},
+					leftPlayer: {},
+					rightPlayer: null,
+					// 定时器
+					timer: 0,
+					// 棋色
+					turn: ""
+				},
+				created: function() {
+					this.rid = window.localStorage.getItem("roomId");
+					this.uid = window.localStorage.getItem("uid");
+					this.getUserbyId(this.uid, true);
+					this.initWebSocket(this.rid, this.uid);
+					// 初始化棋盘
+					initChessBoard();
+				},
+				methods: {
+					subStr(str) {
+						if (str != null) {
+							if (str.length > 5) {
+								return str.replace(str.substring(5, str.length), '...');
+							} else {
+								return str;
+							}
+						}
+					},
+					getUserbyId(id, isLeft) {
+						if (id != null) {
+							mui.ajax(httpServerPrefix + "getUserById?uid=" + id, {
+								dataType: 'json', //服务器返回json格式数据
+								type: 'get', //HTTP请求类型
+								timeout: 10000, //超时时间设置为10秒；
+								success: function(data) {
+									if (data.msg == "error") {
+										mui.alert("用户信息获取失败，请重新进入", "错误", "确定", () => {
+											window.location.href = "index.html"
+										}, 'div');
+									} else {
+										data.avatar = httpServerPrefix + data.avatar;
+										if (isLeft) {
+											app.leftPlayer = data;
+											app.leftPlayer.reday = 0;
+										} else {
+											app.rightPlayer = data;
+											app.rightPlayer.reday = 0;
+										}
+									}
+								},
+								error: function(xhr, type, errorThrown) {
+									//异常处理；
+									mui.alert(type, "错误", "确定", () => {}, 'div');
+								}
+							});
+						} else if (id == null) {
+							mui.alert("用户未登录，请重新登陆",
+								"提示",
+								"好的",
+								function() {
+									window.location.href = "login.html";
+								},
+								'div');
+						}
+					},
+					/**
+					 * 产生随机整数，包含下限值，包括上限值
+					 * @param {Number} lower 下限
+					 * @param {Number} upper 上限
+					 * @return {Number} 返回在下限到上限之间的一个随机整数
+					 */
+					random(lower, upper) {
+						return Math.floor(Math.random() * (upper - lower + 1)) + lower;
+					},
+					/**
+					 * 开关定时器
+					 * @param {Object} time		要定时递增的变量即计时器
+					 * @param {Object} isStart	是否开始
+					 */
+					isTimming(time, isStart) {
+						if (isStart) {
+							if (this.turn==="w"&&currentStep===3) {
+								this.firstChangeBtn = true;
+							} else {
+								this.firstChangeBtn = false;
+							}
+							if (currentStep > 12) {
+								this.regretBtn = true;
+							}
+							this.timer = setInterval(() => {
+								// 使用箭头函数，其内就可以使用this，否则就需要在外面用一个变量接收一下this
+								time++;
+								if (time !== 0) {
+									if (time === 40) {
+										mui.toast('您还有20秒钟考虑', {
+											duration: 'long',
+											type: 'div'
+										});
+									}
+									if (time > 60) {
+										clearInterval(this.timer);
+										time = 0;
+										if (this.turn === "b") {
+											status = "w_win";
+										} else if(this.turn === "w") {
+											status = "b_win";
+										}
+										this.req.code = 7;
+										this.req.res = status;
+										this.ws.send(JSON.stringify(this.req));
+									}
+								}
+							}, 1000);
+						} else {
+							clearInterval(this.timer);
+							time = 0;
+						}
+					},
+					initWebSocket(rid, uid) {
+						this.ws = new WebSocket("ws://192.168.31.139:8989/Gobang/room/" + rid + "/" + uid);
+						this.ws.onopen = function() {
+							// console.log("房间号：" + rid);
+							if (rid == null) {
+								mui.closePopups();
+								mui.alert("房间号不能为空, 不能加入房间",
+									"提示",
+									"收到",
+									() => {
+										window.location.href = "index.html"
+									}, 'div');
+							}
+						};
+						this.ws.onerror = function(event) {
+							mui.closePopups();
+							mui.alert("当前连接状态异常，请重新加入",
+								"错误",
+								"收到",
+								() => {
+									window.location.href = "index.html"
+								}, 'div');
+						};
+						this.ws.onclose = function(event) {
+							mui.closePopups();
+							mui.alert("您已退出房间，请重新加入",
+								"提示",
+								"收到",
+								() => {
+									window.location.href = "index.html"
+								}, 'div');
+						};
+						this.ws.onmessage = function(event) {
+							if (event.data === "isNull") {
+								mui.closePopups();
+								mui.alert("当前是空房间, 不能加入",
+									"提示",
+									"收到",
+									() => {
+										window.location.href = "index.html"
+									}, 'div');
+							} else if (event.data === "full") {
+								mui.closePopups();
+								mui.alert("当前房间已满, 不能加入",
+									"提示",
+									"收到",
+									() => {
+										window.location.href = "index.html"
+									}, 'div');
+							} else if (event.data === "connError") {
+								mui.closePopups();
+								mui.alert("加入失败, 请重新进入",
+									"提示",
+									"收到",
+									() => {
+										window.location.href = "index.html"
+									}, 'div');
+							} else {
+								if (event.data !== "success") {
+									app.resp = JSON.parse(event.data);
+									// console.log(JSON.parse(event.data));
+									if (app.resp.code != null) {
+										switch (app.resp.code) {
+											case 0:
+												mui.alert(app.resp.msg,
+													"提示",
+													"收到",
+													() => {}, 'div');
+												app.getUserbyId(app.resp.enemy, false);
+												app.regretBtn = false;
+												app.redayBtn = true;
+												currentStep = 0;
+												break;
+											case 1:
+												app.rightPlayer = null;
+												mui.alert(app.resp.msg,
+													"提示",
+													"收到",
+													() => {}, 'div');
+												if (status !== "") {
+													app.req.code = 7;
+													status = app.turn + "_win";
+													app.req.res = status;
+													app.ws.send(JSON.stringify(app.req));
+												}
+												currentStep = 0;
+												app.redayBtn = false;
+												app.regretBtn = false;
+												app.leftPlayer.reday = 0;
+												app.firstChangeBtn = false;
+												app.isTimming(time, false);
+												status = "";
+												document.getElementById("chessboard").innerHTML = "";
+												initChessBoard();
+												document.getElementById("leftReday").innerText = "未准备";
+												document.getElementById("redayBtn").innerText = "准备";
+												break;
+											case 2:
+												mui.closePopup();
+												mui.alert(app.resp.msg,
+													"提示",
+													"收到",
+													() => {},
+													'div');
+												app.rightPlayer.reday = app.resp.reday;
+												if (app.rightPlayer.reday===0) {
+													document.getElementById("rightReday").innerText = "未准备";
+												}
+												if (app.rightPlayer.reday===1) {
+													document.getElementById("rightReday").innerText = "已准备";
+												}
+												break;
+											case 3:
+												// 假设有一个棋色数组，var turns = ["b", "w"];
+												// 随机抽取一个棋色，即随机抽一个数组角标，0：黑，1：白
+												mui.closePopup();
+												var index = app.random(0, 1);
+												app.req.code = 3;
+												mui.confirm("开始猜棋，已随机抽取一个棋色，请选择",
+													"猜棋",
+													["黑棋", "白棋"],
+													(e) => {
+														if (e.index === index) {
+															app.req.guess = 1;
+														} else {
+															app.req.guess = 0;
+														}
+														app.ws.send(JSON.stringify(app.req));
+													}, 'div');
+												break;
+											case 4:
+												mui.closePopup();
+												mui.alert(app.resp.msg,
+													"提示",
+													"收到",
+													() => {
+														app.turn = app.resp.turn;
+														if (currentStep===0) {
+															if (app.turn==="b") {
+																app.isTimming(time, true);
+															}
+														}
+														if (currentStep!==0) {
+															if (app.turn==="w") {
+																app.isTimming(time, true);
+																app.firstChangeBtn = false;
+															} else if (app.turn==="b") {
+																app.isTimming(time, false);
+															}
+														}
+														app.redayBtn = false;
+													}, 'div');
+												break;
+											case 5:
+												playChess(app.resp.x, app.resp.y, app.resp.turn);
+												if (app.turn !== app.resp.turn) {
+													app.isTimming(time, true);
+												}
+												break;
+											case 6:
+												mui.closePopup();
+												mui.alert(app.resp.msg,
+													"提示",
+													"收到",
+													() => {
+														chessboard[app.resp.x][app.resp.x] = "";
+														var str = "q" + app.resp.x + "-" + app.resp.y;
+														document.getElementById(str).innerHTML = "";
+														app.isTimming(time, true);
+														currentStep--;
+													}, 'div');
+												break;
+											case 7:
+												mui.closePopup();
+												var message;
+												if (app.turn === app.resp.res.split("_")[0]) {
+													message = "你赢了";
+													app.resCompute(true);
+												} else if (app.turn !== app.resp.res.split("_")[0]) {
+													message = "你输了";
+													app.resCompute(false);
+												}
+												mui.alert(message,
+													"结果",
+													"收到",
+													() => {}, 'div');
+												app.isTimming(time, false);
+												document.getElementById("chessboard").innerHTML = "";
+												status = "";
+												initChessBoard();
+												app.redayBtn = true;
+												app.regretBtn = false;
+												app.firstChangeBtn = false;
+												currentStep = 0;
+												app.leftPlayer.reday = 0;
+												app.rightPlayer.reday = 0;
+												document.getElementById("leftReday").innerText = "未准备";
+												document.getElementById("rightReday").innerText = "未准备";
+												document.getElementById("redayBtn").innerText = "准备";
+												break;
+											case 8:
+												mui.closePopup();
+												mui.alert(app.resp.msg,
+													"提示",
+													"收到",
+													() => {}, 'div');
+												break;
+											case 9:
+												mui.closePopup();
+												mui.confirm(app.resp.msg,
+													"对方申请",
+													["不同意", "同意"],
+													(e) => {
+														if (e.index === 1) {
+															chessboard[app.resp.x][app.resp.y] = "";
+															var str = "q" + app.resp.x + "-" + app.resp.y;
+															document.getElementById(str).innerHTML = "";
+															app.isTimming(time, false);
+															currentStep--;
+														} else {
+															mui.toast('您不同意悔棋', {
+																duration: 'long',
+																type: 'div'
+															});
+														}
+													}, 'div');
+												break;
+											case 10:
+												// 发送聊天消息还没完成
+												break;
+										}
+									}
+								} else {
+									mui.toast('您已进入房间', {
+										duration: 'long',
+										type: 'div'
+									});
+								}
+							}
+						};
+					},
+					reday() {
+						if (this.rightPlayer != null) {
+							if (this.leftPlayer.reday === 0 || this.rightPlayer.reday === 0) {
+								this.req.code = 2;
+								if (this.leftPlayer.reday === 0) {
+									this.req.reday = 1;
+									this.leftPlayer.reday = 1
+									mui.toast('已准备', {
+										duration: 'long',
+										type: 'div'
+									});
+									document.getElementById("leftReday").innerText = "已准备";
+									document.getElementById("redayBtn").innerText = "已准备";
+								} else if (this.leftPlayer.reday === 1) {
+									this.req.reday = 0;
+									this.leftPlayer.reday = 0;
+									mui.toast('取消准备', {
+										duration: 'long',
+										type: 'div'
+									});
+									document.getElementById("leftReday").innerText = "未准备";
+									document.getElementById("redayBtn").innerText = "准备";
+								}
+								this.ws.send(JSON.stringify(this.req));
+							} else {
+								mui.toast('当前正处于游戏中，不能准备', {
+									duration: 'long',
+									type: 'div'
+								});
+							}
+						} else {
+							mui.toast('当前没有玩家进入，不能准备', {
+								duration: 'long',
+								type: 'div'
+							});
+						}
+					},
+					firstChange() {
+						if (this.turn==="w") {
+							if (currentStep===3) {
+								this.req.code = 4;
+								this.req.turn = app.turn;
+								this.ws.send(JSON.stringify(this.req));
+								this.firstChangeBtn = false;
+							} else{
+								mui.toast('当前不是第三手，不能发动三手交换', {
+									duration: 'long',
+									type: 'div'
+								});
+							}
+						} else {
+							mui.toast('黑棋没有三手交换的权利', {
+								duration: 'long',
+								type: 'div'
+							});
+						}
+					},
+					regretChess() {
+						if (currentStep>12) {
+							this.req.code = 9;
+							this.req.x = currentX;
+							this.req.y = currentY;
+							this.ws.send(JSON.stringify(this.req));
+						} else{
+							mui.toast('只有棋盘落子超过12个才能悔棋', {
+								duration: 'long',
+								type: 'div'
+							});
+						}
+					},
+					resCompute(isWin){
+						var newUser = {
+							id: 0,
+							totalGames: 0,
+							winGames: 0,
+							gold: 0
+						};
+						var message;
+						newUser.id = this.leftPlayer.id;
+						newUser.totalGames = this.leftPlayer.totalGames + 1;
+						if (isWin) {
+							newUser.gold = this.leftPlayer.gold + 100;
+							newUser.winGames = this.leftPlayer.winGames + 1;
+							message = "您的金币已增加100";
+						} else{
+							newUser.gold = this.leftPlayer.gold - 100;
+							message = "您的金币已扣除100";
+						}
+						axios.post(httpServerPrefix + "updateUser", newUser)
+							.then((res) => {
+								//app.ks=res.data;
+								var res = res.data;
+								if (res.msg != null) {
+									if (res.msg === "success") {
+										mui.toast(message, {
+											duration: 'long',
+											type: 'div'
+										});
+										app.leftPlayer.gold = newUser.gold;
+										app.leftPlayer.winGames = newUser.winGames;
+										app.leftPlayer.totalGames = newUser.totalGames;
+									} else {
+										mui.alert("服务器异常，结果统计失败",
+											"异常",
+											"收到",
+											() => {},
+											'div');
+									}
+								} else {
+									mui.alert("服务器无响应，请检查网络是否连接",
+										"异常",
+										"收到",
+										() => {},
+										'div');
+								}
+							})
+							.catch((error) => {
+								console.log(error); //异常
+							});
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

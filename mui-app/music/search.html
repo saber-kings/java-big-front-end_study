@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>搜索页</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="./css/mui.min.css">
+		<script src="./js/mui.min.js"></script>
+		<link rel="stylesheet" href="css/mobile.css">
+		<script src="js/common.js"></script>
+		<script type="text/javascript" src="js/vue.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/search.css"/>
+		<script src="js/jquery-1.11.1.min.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<header>
+			<p >搜索结果</p>
+			<a class="prev"><span class="mui-icon mui-icon-arrowleft"></span></a>
+		</header>
+		<ul id='app'>
+			<li v-for="(v,i) in arr" @click="ting(arr,i)">
+				<div class="fl">{{v.author}} -</div>
+				<div class="fl two">{{v.title}}</div>
+				<div class="clear"></div>
+			</li>
+			<!-- <li>
+				<div class="fl">name-</div>
+				<div class="fl two">music_name</div>
+				<div class="clear"></div>
+			</li> -->
+		</ul>
+		<script type="text/javascript">
+			mui.init({
+				
+			    //监听Android手机的back、menu按键 
+			    keyEventBind: { 
+				  backbutton: false,  //Boolean(默认true)关闭back按键监听 
+				  menubutton: false   //Boolean(默认true)关闭menu按键监听 
+			    }, 
+			});
+			var app=new Vue({
+				el:"#app",
+				data:{
+					keyword:'演员',
+					arr:[],
+				},
+				mounted(){
+					var that=this;
+					window.addEventListener('keyword', function(e) {
+						console.log(e.detail.keyword);
+						that.keyword=e.detail.keyword;
+						that.req(that.keyword);
+					});
+					// that.req(that.keyword);
+				},
+				methods:{
+					ting(e,i){
+						localStorage.setItem('i',i);
+						var arr=[];
+						for(var i=0;i<e.length;i++){
+							arr.push(e[i].song_id);
+							console.log(e[i].song_id)
+						}
+						localStorage.setItem('ids',arr);
+					},
+					req(e){
+						var that=this;
+						$.ajax({
+							type:"get",
+							url:"http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.0&method=baidu.ting.search.merge&format=json&query="+e+"&page_no=1&page_size=25&type=-1&data_source=0&use_cluster=1",
+							dataType:"jsonp",
+							success:function(z){
+								//console.log(z.result.song_info.song_list);
+								that.arr=z.result.song_info.song_list;
+							},
+							error: function(z){
+							    that.arr=[{title:"获取音乐失败"}]
+							}
+						})
+					}
+				}
+			})
+			var detailPage = null;
+			// 点击列表，播放对应歌曲
+			mui('#app').on('tap','li',function(){
+				mui.plusReady(function(){    
+				 var id = localStorage.getItem('i');
+				  //获得详情页面
+				  if(!detailPage){
+				    detailPage = plus.webview.getWebviewById('bofang.html');
+				  }
+				  //触发详情页面的newsId事件
+				  mui.fire(detailPage,'newsId',{
+				    id:id
+				  });
+				
+				})
+				mui.openWindow({
+					id:"bofang.html",
+					url:'bofang.html'
+				})
+				this.click();
+			})
+			$('.prev').on('tap',function(){
+				mui.back();
+			})
+		</script>
+	</body>
+</html>

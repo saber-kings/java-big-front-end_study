@@ -1,0 +1,96 @@
+.search{
+    .top{
+        display: flex;
+        width: 100%;
+        height: 12vw;
+        justify-content: center;
+        align-items: center;
+        background-color: #d44439;
+        .arrow-left {
+            display: flex;
+            justify-content: center;
+            flex: 1.1;
+        }
+        .input{
+            flex: 7;
+            width: 70vw;
+            height: 7vw;
+            font-size: 3.5vw;
+            border: none;
+            color: #fff;
+            border-bottom: 1px solid #fff;
+            background-color: #d44439;
+        }
+        input::-webkit-input-placeholder{
+            color: #f0f0f0;
+        }
+        .arrow-right{
+            display: flex;
+            justify-content: center;
+            flex: 1;
+        }
+    }
+    // 搜索前显示的数据
+    .hot-search{
+        .hot-title{
+            height: 12vw;
+            border-bottom: 1px solid #e0e0e0;
+            span{
+                margin-left: 3vw;
+                font-weight: 600;
+                line-height: 12vw;
+                font-size: 4vw;
+                color: #555;
+            }
+        }
+        .hot-list{
+            .hot-list-item{
+                display: flex;
+                // flex-direction: column;
+                // justify-content: center;
+                align-items: center;
+                height: 16vw;
+                color: #555;
+                border-bottom: 1px solid #e0e0e0;
+                .item-idx{
+                    display: flex;
+                    flex: 1;
+                    font-size: 5vw;
+                    justify-content: center;
+                }
+                .hot-name{
+                    flex: 5;
+                    font-size: 4vw;
+                }
+            }
+        }
+       
+    }
+    // 搜索后显示的数据
+    .searchData{
+        .search-list{
+            height: 16vw;
+            margin-left: 5vw;
+            border-bottom: 1px solid #e0e0e0;
+            .search-name{
+                font-size: 5vw;
+                line-height: 10vw;
+            }
+            .search-name-list{
+                .search-names{
+                    float: left;
+                    padding: 0 1.5vw 0 0;
+                    font-size: 3.5vw;
+                }
+            }
+        }
+    }
+}
+.slide-enter-active,
+.slide-leave-active {
+    transition: all 0.3s;
+}
+.slide-enter,
+.slide-leave-to {
+    transform: translate3d(100%, 0, 0);
+}

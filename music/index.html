@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>MUI音乐列表</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<script src="js/mui.min.js"></script>
+		<link href="css/font-awesome.min.css" rel="stylesheet">
+		<style>
+			html,
+			body {
+				background-color: #efeff4;
+			}
+			p {
+				text-indent: 22px;
+			}
+			span.mui-icon {
+				font-size: 14px;
+				color: #007aff;
+				margin-left: -15px;
+				padding-right: 10px;
+			}
+			.mui-off-canvas-left {
+				color: #fff;
+			}
+			.title {
+				margin: 35px 15px 10px;
+			}
+			.title+.content {
+				margin: 10px 15px 35px;
+				color: #bbb;
+				text-indent: 1em;
+				font-size: 14px;
+				line-height: 24px;
+			}
+			input {
+				color: #000;
+			}
+			[v-clock] {
+				display: none;
+			}
+		</style>
+		<link rel="stylesheet" href="css/mobile.css">
+		<link href="css/index.css" rel="stylesheet" />
+		<script src="js/common.js"></script>
+		<script>
+			mui.init({
+				preloadPages:[
+				    {
+				      url:'bofang.html',
+				      id:'bofang.html'
+				    },
+					{
+					  url:'search.html',
+					  id:'search.html'
+					},
+				  ],
+				  gestureConfig:{
+				     tap: true, //默认为true
+				     doubletap: true, //默认为false
+				     longtap: true, //默认为false
+				     swipe: true, //默认为true
+				     drag: true, //默认为true
+				     hold:false,//默认为false，不监听
+				     release:false//默认为false，不监听
+				    }
+			});
+			
+			//获取原始窗口的高度
+			var originalHeight = document.documentElement.clientHeight || document.body.clientHeight;
+			
+			window.onresize = function() {
+				//软键盘弹起与隐藏  都会引起窗口的高度发生变化
+				var resizeHeight = document.documentElement.clientHeight || document.body.clientHeight;
+				if (resizeHeight * 1 < originalHeight * 1) { //resizeHeight<originalHeight证明窗口被挤压了
+					plus.webview.currentWebview().setStyle({
+						height: originalHeight
+					});
+			
+				}
+			}
+		</script>
+	</head>
+
+	<body>
+		<!-- <div class="fenye"> -->
+		<div id="offCanvasWrapper" class="mui-off-canvas-wrap mui-draggable">
+			<!--侧滑菜单部分-->
+			<aside id="offCanvasSide" class="mui-off-canvas-left">
+				<div id="offCanvasSideScroll" class="mui-scroll-wrapper">
+					<div class="mui-scroll">
+						<div class="content">
+							<div class="title">侧滑导航</div>
+							<p style="margin: 10px 15px;">
+								<button id="offCanvasHide" type="button" class="mui-btn mui-btn-danger mui-btn-block" style="padding: 5px 20px;" @click="logout()">退出</button>
+							</p>
+						</div>
+						<div class="title" style="margin-bottom: 25px;"> </div>
+						<ul class="mui-table-view mui-table-view-chevron mui-table-view-inverted">
+							<li class="mui-table-view-cell">
+								<a class="mui-navigate-right">
+									Item 1
+								</a>
+							</li>
+
+						</ul>
+					</div>
+				</div>
+			</aside>
+			<!--主界面部分-->
+			<div class="mui-inner-wrap">
+				<header class="mui-bar mui-bar-nav">
+					<a class="mulu fl" href="#offCanvasSide"><span class="mui-icon mui-icon-bars"></span></a>
+					<h4 class="home">音久音乐盒</h4>
+					<a class="search fr"><span class="mui-icon mui-icon-search"></span></a>
+					<div class="clear"></div>
+					<div class="mui-input-row mui-search mui-active">
+						<input type="search" class="mui-input-clear" placeholder="歌曲，专辑，歌手，伴奏" onkeyup="enterSearch(event)">
+					</div>
+				</header>
+				<div id="offCanvasContentScroll" class="mui-content mui-scroll-wrapper">
+					<div class="mui-scroll">
+						<div id="slider" class="mui-slider">
+							<div class="mui-slider-group mui-slider-loop">
+								<!-- 额外增加的一个节点(循环轮播：第一个节点是最后一张轮播) -->
+								<div class="mui-slider-item mui-slider-item-duplicate">
+									<a href="#">
+										<img src="images/banner3.jpg">
+									</a>
+								</div>
+								<!-- 第一张 -->
+								<div class="mui-slider-item">
+									<a href="#">
+										<img src="images/banner1.jpg">
+									</a>
+								</div>
+								<!-- 第二张 -->
+								<div class="mui-slider-item">
+									<a href="#">
+										<img src="images/banner2.jpg">
+									</a>
+								</div>
+								<!-- 第三张 -->
+								<div class="mui-slider-item">
+									<a href="#">
+										<img src="images/banner3.jpg">
+									</a>
+								</div>
+
+								<!-- 额外增加的一个节点(循环轮播：最后一个节点是第一张轮播) -->
+								<div class="mui-slider-item mui-slider-item-duplicate">
+									<a href="#">
+										<img src="images/banner1.jpg">
+									</a>
+								</div>
+							</div>
+							<!-- 轮播图的小圆点 -->
+							<div class="mui-slider-indicator">
+								<div class="mui-indicator mui-active"></div>
+								<div class="mui-indicator"></div>
+								<!-- <div class="mui-indicator"></div> -->
+								<div class="mui-indicator"></div>
+							</div>
+							<!-- 侧滑 -->
+						</div>
+
+
+
+						<!-- 选项卡 -->
+						<div class="content-title">
+							<div id="segmentedControl" class="mui-segmented-control mui-segmented-control-inverted mui-segmented-control-primary">
+								<a class="mui-control-item mui-active" href="#item1">热歌榜</a>
+								<a class="mui-control-item" href="#item2">新歌榜</a>
+								<a class="mui-control-item" href="#item3">网络歌曲榜</a>
+							</div>
+						</div>
+						<div id="app" v-cloak>
+							<div class="content" style="overflow: auto;margin-bottom: 50px;margin-top: 5px;">
+								<div id="item1" class="mui-control-content mui-active">
+									<div class="list-box">
+										<ul class="list">
+											<li v-for="(v,i) in arr" @click="ting(arr,i)">
+												<img :src="v.pic_big" alt="" class="fl">
+												<div class="fl right">
+													<p class="song_name">{{v.title}}</p>
+													<p class="author">{{v.author}}</p>
+												</div>
+												<div class="clear"></div>
+											</li>
+										</ul>
+									</div>
+
+								</div>
+								<div id="item2" class="mui-control-content">
+									<div class="list-box">
+										<ul class="list">
+											<li v-for="(v,i) in arr2" @click="ting(arr2,i)">
+												<img :src="v.pic_big" alt="" class="fl">
+												<div class="fl right">
+													<p class="song_name">{{v.title}}</p>
+													<p class="author">{{v.author}}</p>
+												</div>
+												<div class="clear"></div>
+											</li>
+										</ul>
+									</div>
+								</div>
+								<div id="item3" class="mui-control-content">
+									<div class="list-box">
+										<ul class="list">
+											<li v-for="(v,i) in arr3" @click="ting(arr3,i)">
+												<img :src="v.pic_big" alt="" class="fl">
+												<div class="fl right">
+													<p class="song_name">{{v.title}}</p>
+													<p class="author">{{v.author}}</p>
+												</div>
+												<div class="clear"></div>
+
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="bottom">
+					<div class="fl song-box">
+						下山（改编版）
+					</div>
+					<div class="fr icon-box">
+						<a class="icon fr show" id="show"><span class="mui-icon mui-icon-forward"></span></a>
+						<a class="icon2 control fr" id="play"><i class="fa fa-play"></i></a>
+						<a class="icon2 control fr" id="pause"><i class="fa fa-pause"></i></a>
+					</div>
+				</div>
+				<!-- off-canvas backdrop -->
+				<!-- <div class="mui-off-canvas-backdrop"></div> -->
+			</div>
+		</div>
+		<!-- 右 -->
+		<!-- </div> -->
+
+		<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+		<script type="text/javascript" src="js/vue.min.js"></script>
+		<script>
+			var app = new Vue({
+				el: "#app",
+				data: {
+					songname: '',
+					singer: '',
+					imgUrl: ',',
+					arr: [],
+					arr2: [],
+					arr3: [],
+				},
+				methods: {
+					ting(e, i) {
+						localStorage.setItem('i', i);
+						// console.log(e[0].song_id)
+						var arr = [];
+						for (var i = 0; i < e.length; i++) {
+							arr.push(e[i].song_id);
+						}
+						localStorage.setItem('ids', arr);
+					},
+					req() {
+						var that = this;
+						$.ajax({
+							type: "get",
+							url: "http://tingapi.ting.baidu.com/v1/restserver/ting?size=20&type=2&callback=cb_list&_t=1468380543284&format=json&method=baidu.ting.billboard.billList",
+							data: '',
+							dataType: "jsonp",
+							success: function(z) {
+								that.arr = z.song_list;
+								// console.log(that.arr)
+							},
+							error: function(z) {
+								that.arr = [{
+									title: "获取音乐失败"
+								}]
+							}
+						})
+						$.ajax({
+							type: "get",
+							url: "http://tingapi.ting.baidu.com/v1/restserver/ting?size=20&type=1&callback=cb_list&_t=1468380543284&format=json&method=baidu.ting.billboard.billList",
+							data: '',
+							dataType: "jsonp",
+							success: function(z) {
+								that.arr2 = z.song_list;
+							},
+							error: function(z) {
+								that.arr = [{
+									title: "获取音乐失败"
+								}]
+							}
+						})
+						$.ajax({
+							type: "get",
+							url: "http://tingapi.ting.baidu.com/v1/restserver/ting?size=20&type=25&callback=cb_list&_t=1468380543284&format=json&method=baidu.ting.billboard.billList",
+							data: '',
+							dataType: "jsonp",
+							success: function(z) {
+								that.arr3 = z.song_list;
+							},
+							error: function(z) {
+								that.arr = [{
+									title: "获取音乐失败"
+								}]
+							}
+						})
+					},
+					logout(){
+						window.localStorage.removeItem("uid");
+						window.localStorage.removeItem("realName");
+						window.location.href="login.html";
+					}
+				},
+				beforeUpdate() {
+
+				},
+
+				created() {
+					this.req();
+				},
+				mounted() {
+
+
+				},
+			});
+			//主界面容器
+			var offCanvasWrapper = mui('#offCanvasWrapper');
+			 //菜单容器
+			var offCanvasSide = document.getElementById("offCanvasSide");
+			if (!mui.os.android) {
+				//document.getElementById("move-togger").classList.remove('mui-hidden');
+				var spans = document.querySelectorAll('.android-only');
+				for (var i = 0, len = spans.length; i < len; i++) {
+					spans[i].style.display = "none";
+				}
+			}
+			 //移动效果是否为整体移动
+			var moveTogether = false;
+			 //侧滑容器的class列表，增加.mui-slide-in即可实现菜单移动、主界面不动的效果；
+				
+			document.getElementById("offCanvasSide").classList.remove('mui-transitioning');
+			offCanvasSide.setAttribute('style', '');
+			mui('#offCanvasWrapper')[0].classList.remove('mui-slide-in');
+			mui('#offCanvasWrapper')[0].classList.remove('mui-scalable');
+			this.value="main-move-scalable";
+			switch (this.value) {
+			
+				case 'main-move-scalable':
+					if (moveTogether) {
+						//仅主内容滑动时，侧滑菜单在off-canvas-wrap内，和主界面并列
+						offCanvasWrapper[0].insertBefore(offCanvasSide, offCanvasWrapper[0].firstElementChild);
+					}
+					mui('#offCanvasWrapper')[0].classList.add('mui-scalable');
+					break;
+				
+			}
+			offCanvasWrapper.offCanvas().refresh();
+				
+			 //菜单界面，‘关闭侧滑菜单’按钮的点击事件
+			document.getElementById('offCanvasHide').addEventListener('tap', function() {
+				offCanvasWrapper.offCanvas('close');
+			});
+			 //主界面和侧滑菜单界面均支持区域滚动；
+			mui('#offCanvasSideScroll').scroll();
+			mui('#offCanvasContentScroll').scroll();
+			 //实现ios平台原生侧滑关闭页面；
+			if (mui.os.plus && mui.os.ios) {
+				mui.plusReady(function() { //5+ iOS暂时无法屏蔽popGesture时传递touch事件，故该demo直接屏蔽popGesture功能
+					plus.webview.currentWebview().setStyle({
+						'popGesture': 'none'
+					});
+				});
+			}
+			
+			//获得slider插件对象
+			var gallery = mui('.mui-slider');
+			gallery.slider({
+				interval: 5000 //自动轮播周期，若为0则不自动播放，默认为0；
+			});
+			var detailPage = null;
+			// 点击列表，播放对应歌曲
+			mui('#app').on('tap', 'li', function() {
+				mui.plusReady(function() {
+					var id = localStorage.getItem('i');
+					//获得详情页面
+					if (!detailPage) {
+						detailPage = plus.webview.getWebviewById('bofang.html');
+					}
+					//触发详情页面的newsId事件
+					mui.fire(detailPage, 'newsId', {
+						id: id
+					});
+					mui.openWindow({
+						id: "bofang.html"
+					})
+				})
+				this.click();
+			})
+			// 显示播放页面
+			var detailPage = null;
+			$('.show').on('tap', function() {
+				mui.plusReady(function() {
+					mui.openWindow({
+						id: "bofang.html",
+					})
+				})
+				//this.click();
+			})
+			var detailPage = null;
+			$('.fa-play').on('tap', function() {
+				mui.plusReady(function() {
+					var auto = "$('audio')[0].play()";
+					//获得详情页面
+					if (!detailPage) {
+						detailPage = plus.webview.getWebviewById('bofang.html');
+					}
+					//触发详情页面的newsId事件
+					mui.fire(detailPage, 'newsId', {
+						auto: auto
+					});
+
+				})
+				$('#play').css('display', 'none')
+				$('#pause').css('display', 'block');
+			})
+			$('.fa-pause').on('tap', function() {
+				mui.plusReady(function() {
+					var pause = "$('audio')[0].pause()";
+					//获得详情页面
+					if (!detailPage) {
+						detailPage = plus.webview.getWebviewById('bofang.html');
+					}
+					//触发详情页面的newsId事件
+					mui.fire(detailPage, 'newsId', {
+						pause: pause
+					});
+
+				})
+				$('#play').css('display', 'block')
+				$('#pause').css('display', 'none');
+			})
+			var bo = false;
+			$('.search').on('tap', function() {
+				if (bo == false) {
+					$(".mui-input-row").css('display', 'block');
+					bo = true;
+				} else {
+					$(".mui-input-row").css('display', 'none');
+					bo = false
+				}
+			})
+			//监听back，方法页面返回的参数
+			document.addEventListener('backIndexPage', function(e) {
+				if (e.detail.str == false) {
+					$('#play').css('display', 'block')
+					$('#pause').css('display', 'none');
+				} else {
+					$('#play').css('display', 'none')
+					$('#pause').css('display', 'block');
+				}
+				$('.song-box').html(e.detail.song);
+			})
+			mui.plusReady(function() {
+				setTimeout(function() {
+					var array = plus.webview.all();
+					if (array) {
+						for (var i = 0, len = array.length; i < len; i++) {
+							console.log(array[i].getURL());
+						}
+					}
+				}, 5000)
+
+
+			})
+			// 搜索
+
+			function enterSearch(event) {
+				// $('.mui-input-clear').css('display','block')
+				if (event.keyCode == 13) { //用户点击回车的事件号为13
+					var detailPage = null;
+					mui.trigger($('.search')[0], 'tap');
+					mui.plusReady(function(keyword) {
+						var keyword = $('.mui-input-clear').val();
+						//获得详情页面
+						$('.mui-input-clear').val('');
+						if (!detailPage) {
+							detailPage = plus.webview.getWebviewById('search.html');
+						}
+						//触发详情页面的newsId事件
+						mui.fire(detailPage, 'keyword', {
+							keyword: keyword
+						});
+						mui.openWindow({
+							id: "search.html",
+						})
+
+					})
+				}
+			}
+		</script>
+	</body>
+
+</html>
