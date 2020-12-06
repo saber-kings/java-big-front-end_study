@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>网上银行系统</title>
+		<!-- 响应式适应设置 -->
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+		<!-- 图标 -->
+		<link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css">
+		<!-- 主题样式 -->
+		<link rel="stylesheet" href="dist/css/AdminLTE.min.css">
+		<link rel="stylesheet" href="dist/css/skins/skin-blue.min.css">
+		<!-- Google Font -->
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+		<style>
+			.t123 {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				right: 0px;
+				bottom: 0px;
+				z-index: 999;
+				background-color: rgba(0, 0, 0, .85);
+			}
+			
+			.t123 .t456 {
+				margin: 100px auto;
+				margin-bottom: 0;
+				padding-top: 40px;
+				padding-bottom: 20px;
+				max-width: 60%;
+				max-height: 80%;
+				background-color: white;
+				border-radius: 5px;
+			}
+			
+			
+			.t123 .info {
+				width: 300px;
+				height: 40px;
+				margin: 200px auto;
+				margin-bottom: 0;
+				background-color: rgba(0, 0, 0, .1);
+				border-radius: 3px;
+				color: white;
+				text-align: center;
+				line-height: 40px;
+				z-index: 9999 !important;
+			}
+			
+			.t123 .error{
+				width: 300px;
+				height: 40px;
+				margin: 200px auto;
+				background-color: rgba(0, 0, 0, .1);
+				border-radius: 3px;
+				color: red;
+				text-align: center;
+				line-height: 40px;
+				z-index: 9999 !important;
+			}
+			
+			.my-close-btn {
+				width: 30px;
+				height: 30px;
+				text-align: center;
+				cursor: pointer;
+			}
+			
+			.vl {
+				width: 20%;
+				margin: 0 auto;
+				height: 50px;
+			}
+			
+			.vl-btn{
+				padding: 10px 0;
+			}
+			
+			.iframe-style {
+				min-height: 100%;
+				overflow: auto;
+			}
+		  
+			[v-cloak] {
+				display: none
+			}
+		</style>
+		<link rel="stylesheet" href="css/animate.min.css" />
+		<!-- Vue + Axios -->
+		<script src="js/vue.min.js"></script>
+		<script src="js/axios.min.js"></script>
+		<!-- jQuery -->
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script>
+			var w;
+		  	function init() {
+				if(window.localStorage.getItem("aid") == null) {
+					window.location.href = "login.html";
+				} else {
+					var aid = window.localStorage.getItem("aid");
+					w = new WebSocket("ws://localhost:8080/DcitsBankV1.0/echo/" + aid);
+					w.onopen = function() {
+						
+					};
+					w.onclose = function() {
+							    
+					};
+					w.onmessage = function(event) {
+						console.log(JSON.parse(event.data));
+						app.showMsgs(JSON.parse(event.data));
+					};
+				}
+		  	}
+		</script>
+	</head>
+	<body class="hold-transition skin-blue sidebar-mini" onload="init();">
+		<div class="wrapper" id="app">
+			<!-- 利用vue.js+animate.css手写实现弹出层 -->
+			<transition leave-active-class="animated fadeOut" enter-active-class="animated fadeIn">
+				<div class="t123" v-show="showMask" v-cloak>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="t456" v-show="showNotice">
+							<a href="javascript:void(0);" class="my-close-btn" style="float: right;position: relative;top: -30px;" @click="closeNotices();">
+								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+							</a>
+							<ul class="list-group" style="padding: 0 20px">
+								<li class="list-group-item header" style="text-align: center;" v-cloak>你有 {{msgs.length}} 条通知</li>
+								<!-- 通知列表 -->
+								<li class="list-group-item" v-for="m in msgs" style="text-align: center;" v-cloak>
+									<h4 class="list-group-item-heading">
+										<i class="fa fa-users text-aqua"></i> 
+										<strong>{{m.name}}&nbsp;</strong>
+									</h4>
+									<p class="list-group-item-text">
+										{{m.msg}}
+									</p>
+								</li>
+							</ul>
+							<div class="vl vl-btn">
+								<div class="btn btn-success btn-sm pull-right" @click="recevivedNotices();">提交</div>
+								<div class="btn btn-default btn-sm pull-left" @click="closeNotices();">收到</div>
+							</div>
+						</div>
+					</transition>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="info" v-show="showInfo">
+							<div>"{{info}}"</div>
+						</div>
+					</transition>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="error" v-show="showError">
+							<div>"{{info}}"</div>
+						</div>
+					</transition>
+				</div>
+			</transition>
+			<header class="main-header">
+
+				<!-- Logo -->
+				<a href="index.html" class="logo">
+					<!-- mini logo for sidebar mini 50x50 pixels -->
+					<span class="logo-mini"><b><i class="fa fa-hand-o-right" aria-hidden="true"></i></b></span>
+					<!-- logo for regular state and mobile devices -->
+					<span class="logo-lg"><b>网上银行系统</b></span>
+				</a>
+
+				<!-- 头部栏 -->
+				<nav class="navbar navbar-static-top" role="navigation">
+					<!-- 侧边栏收缩按钮 -->
+					<a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+						<span class="sr-only">Toggle navigation</span>
+					</a>
+					<!-- 头部右上角菜单 -->
+					<div class="navbar-custom-menu">
+						<ul class="nav navbar-nav">
+							<!-- 收到的通知 -->
+							<li class="dropdown notifications-menu">
+								<!-- 打开按钮 -->
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+									<i class="fa fa-bell-o"></i>
+									<!-- 数量 -->
+									<span class="label label-warning" v-show="msgs.length!==0" v-cloak>{{msgs.length}}</span>
+								</a>
+								<ul class="dropdown-menu">
+									<li class="header" v-cloak>你有 {{msgs.length}} 条通知</li>
+									<li>
+										<!-- 通知列表 -->
+										<ul class="menu">
+											<li v-for="m in msgs" v-cloak>
+												<!-- 单条消息预览 -->
+												<a href="#">
+													<i class="fa fa-users text-aqua"></i> 
+													<strong>{{m.name}}:&nbsp;</strong>
+													{{m.msg}}
+												</a>
+											</li>
+											<!-- 结束 -->
+										</ul>
+									</li>
+									<li class="footer">
+										<a href="javascript:void(0)" @click="showNotices();">查看所有</a>
+									</li>
+								</ul>
+							</li>
+							
+							<!-- 用户账号信息菜单 -->
+							<li class="dropdown user user-menu">
+								<!-- 打开按钮 -->
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+									<!-- 用户头像 -->
+									<img src="dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+									<!-- hidden-xs在小型设备上隐藏用户名，因此仅显示图像. -->
+									<span class="hidden-xs" v-cloak>{{realName}}</span>
+								</a>
+								<ul class="dropdown-menu">
+									<!-- 菜单中的用户图像 -->
+									<li class="user-header">
+										<img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+
+										<p v-cloak>
+											{{realName}}
+											<small>2017年11月开户</small>
+										</p>
+									</li>
+									<!-- 菜单底部-->
+									<li class="user-footer">
+										<div class="pull-left">
+											<a href="#" data-toggle="control-sidebar" class="btn btn-default btn-flat">个人资料</a>
+										</div>
+										<div class="pull-right">
+											<a href="javascript:void(0)" @click="logout();" class="btn btn-default btn-flat">登出</a>
+										</div>
+									</li>
+								</ul>
+							</li>
+							<!-- 控制侧栏切换按钮 -->
+							<li>
+								<a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			</header>
+			<!-- 侧边栏导航 -->
+			<aside class="main-sidebar">
+
+				<!-- 侧边栏主体内容 -->
+				<section class="sidebar">
+
+					<!-- 侧边栏用户信息 -->
+					<div class="user-panel">
+						<div class="pull-left image">
+							<img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+						</div>
+						<div class="pull-left info">
+							<p v-cloak>欢迎 {{realName}}</p>
+							<!-- 登录状态 -->
+							<a href="#"><i class="fa fa-circle text-success"></i> 在线 </a>
+						</div>
+					</div>
+
+					<!-- 搜索菜单项 -->
+					<!-- <form action="#" method="get" class="sidebar-form">
+						<div class="input-group">
+							<input type="text" name="q" class="form-control" placeholder="Search...">
+							<span class="input-group-btn">
+								<button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+								</button>
+							</span>
+						</div>
+					</form> -->
+
+					<!-- 侧边栏所有导航菜单 -->
+					<ul class="sidebar-menu" data-widget="tree">
+						<li class="header select-li">导航</li>
+						<!-- 一级菜单 -->
+						<li class="active select-li" @click="onClicked($event)">
+							<a href="welcome.html" target="page">
+								<i class="fa fa-link"></i>
+								<span>首页</span>
+							</a>
+						</li>
+						<li class="select-li" @click="onClicked($event)" v-for="m in menus" v-cloak>
+							<a href="#" :href="m.murl" target="page">
+								<i class="fa fa-link"></i>
+								<span>{{m.menuText}}</span>
+							</a>
+						</li>
+					</ul>
+				</section>
+			</aside>
+
+			<!--右方主体内容 -->
+			<div class="content-wrapper">
+				<!-- 头部标题栏 -->
+				<section class="content-header">
+					<h1>
+						首页
+					</h1>
+					<ol class="breadcrumb">
+						<li><a href="#"><i class="fa fa-dashboard"></i> 仪表盘</a></li>
+						<li class="active">首页</li>
+					</ol>
+					<!--文字滚动 end-->
+				</section>
+
+				<!-- 主体内容 -->
+				<section class="content container-fluid" style="height:600px;height:auto;min-height: 100%;">
+					<div class="embed-responsive embed-responsive-16by9">
+						<iframe id="page" class="embed-responsive-item iframe-style" name="page" src="welcome.html"></iframe>
+					</div>
+				</section>
+			</div>
+			<!-- 底部版权声明 -->
+			<footer class="main-footer">
+				<!-- To the right -->
+				<div class="pull-right hidden-xs">
+					版权所有
+				</div>
+				<!-- Default to the left -->
+				<strong>Copyright &copy; 2020 <a href="index.html">DCITS</a>.</strong> All rights reserved.
+			</footer>
+
+			<!-- 右上角设置按钮点击后展开的菜单 -->
+			<aside class="control-sidebar control-sidebar-dark">
+				<!-- 选项卡标签 -->
+				<ul class="nav nav-tabs nav-justified control-sidebar-tabs">
+					<li class="active"><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
+					<li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
+				</ul>
+				<!-- 选项卡内容 -->
+				<div class="tab-content">
+					<!-- 默认显示的选项卡内容 -->
+					<div class="tab-pane active" id="control-sidebar-home-tab">
+						<h3 class="control-sidebar-heading">近期活动</h3>
+						<ul class="control-sidebar-menu">
+							<li>
+								<a href="javascript:;">
+									<i class="menu-icon fa fa-birthday-cake bg-red"></i>
+
+									<div class="menu-info">
+										<h4 class="control-sidebar-subheading">李四生日聚会</h4>
+
+										<p>5月7日举办</p>
+									</div>
+								</a>
+							</li>
+						</ul>
+
+					</div>
+					<!-- 其他选项卡的内容 -->
+					<div class="tab-pane" id="control-sidebar-stats-tab">统计标签内容</div>
+					<div class="tab-pane" id="control-sidebar-settings-tab">
+						<form method="post">
+							<h3 class="control-sidebar-heading">个人信息</h3>
+							<div class="form-group">
+								<label class="control-sidebar-subheading">
+									姓名：{{person.realName}}
+									<input type="checkbox" class="pull-right" checked>
+								</label>
+								
+								<p>
+									账号：{{person.account}}
+								</p>
+								<p>
+									年龄：{{person.age}}
+								</p>
+								<p>
+									性别：{{person.sex}}
+								</p>
+								<p>
+									卡号：{{person.card}}
+								</p>
+								<p>
+									余额：{{person.balance}}
+								</p>
+								<p>
+									手机号：{{person.phone}}
+								</p>
+								<p>
+									地址：{{person.address}}
+								</p>
+							</div>
+						</form>
+					</div>
+				</div>
+			</aside>
+			<!-- 添加侧边栏的背景，该div必须放在控制侧栏之后 -->
+			<div class="control-sidebar-bg"></div>
+		</div>
+		<script>
+			var app = new Vue({
+				el: "#app",
+				data: {
+					aid: 0,
+					realName: "",
+					menus: [],
+					person: {},
+					msgs: [],
+					showMask: false,
+					showNotice: false,
+					showInfo: false,
+					showError: false,
+					info: ""
+				},
+				created: function() {
+					if(window.localStorage.getItem("aid") == null) {
+						window.location.href = "login.html";
+					} else {
+						this.aid = window.localStorage.getItem("aid");
+						var account = window.localStorage.getItem("account");
+						this.realName = window.localStorage.getItem("realName");
+						var balance = window.localStorage.getItem("balance");
+						axios.get("getMenus")
+							.then((res) => {
+								app.menus = res.data;
+								//console.log(app.menus);
+							})
+							.catch((error) => {
+								console.log(error); //异常
+							});
+						axios.get("getInfo?aid=" + this.aid)
+						.then((res) => {
+							app.person = res.data;
+							app.person.account = account;
+							app.person.balance = balance;
+							//console.log(app.person);
+						})
+						.catch((error) => {
+							console.log(error); //异常
+						});
+					}
+				},
+				methods: {
+					openMask: function() {
+						this.showMask = true;
+					},
+					closeMask: function() {
+						this.showMask = false;
+					},
+					openInfo: function(msg) {
+						this.info = msg;
+						this.showInfo = true;
+					},
+					closeInfo: function() {
+						this.showInfo = false;
+					},
+					openError: function(msg) {
+						this.info = msg;
+						this.showError = true;
+					},
+					closeError: function() {
+						this.showError = false;
+					},
+					propInfo: function(msg) {
+						this.openMask();
+						this.openInfo(msg);
+						setTimeout(function() {
+							app.closeInfo();
+							app.closeMask();
+						}, 1500);
+					},
+					propError: function(msg) {
+						this.openMask();
+						this.openError(msg);
+						setTimeout(function() {
+							app.closeMask();
+							app.closeError();
+						}, 3000);
+					},
+					onClicked(event) {
+						var li = $(".select-li");
+						for (var i = 0; i < li.length; i++) {
+							if ($(li[i]).hasClass("active")) {
+								$(li[i]).removeClass("active");
+							}
+						}
+						//获取点击对象      
+						var el = event.currentTarget;
+						// console.log(el);
+						$(el).addClass("active");
+					},
+					showMsgs(msg) {
+						this.msgs.push(msg);
+					},
+					logout() {
+						window.localStorage.removeItem("aid");
+						window.localStorage.removeItem("realName");
+						window.localStorage.removeItem("balance");
+						axios.get("logout?aid=" + this.aid)
+							.then((res) => {
+								if (res.data.msg === "success") {
+									window.location.href = "login.html";
+								}
+							})
+							.catch((error) => {
+								console.log(error); //异常
+							});
+					},
+					showNotices() {
+					},
+					closeNotices() {
+					},
+					recevivedNotices(){
+					}
+				}
+			});
+		</script>
+		<!-- Bootstrap 3.3.7 -->
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+		<!-- AdminLTE App -->
+		<script src="dist/js/adminlte.min.js"></script>
+	</body>
+</html>

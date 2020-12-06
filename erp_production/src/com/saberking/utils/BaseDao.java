@@ -20,7 +20,7 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 public class BaseDao {
 
 	public static final String connstr = "com.mysql.cj.jdbc.Driver";
-	public static final String dr = "jdbc:mysql://192.168.31.32:3306/erp_production?useSSL=false&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8";
+	public static final String dr = "jdbc:mysql://localhost:3306/erp_production?useSSL=false&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8";
 	public static final String uid = "root";
 	public static final String pwd = "admin123";
 

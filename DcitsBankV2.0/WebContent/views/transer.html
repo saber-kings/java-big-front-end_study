@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>转账功能</title>
+		<link href="../css/tail.css" rel="stylesheet" type="text/css" />
+		<link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+		<link rel="stylesheet" href="../css/animate.min.css" />
+		<style>
+			.t123 {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				right: 0px;
+				bottom: 0px;
+				z-index: 999;
+				background-color: rgba(0, 0, 0, .85);
+			}
+			
+			.t123 .info {
+				width: 300px;
+				height: 40px;
+				margin: 200px auto;
+				margin-bottom: 0;
+				background-color: rgba(0, 0, 0, .1);
+				border-radius: 3px;
+				color: white;
+				text-align: center;
+				line-height: 40px;
+				z-index: 9999 !important;
+			}
+			
+			.t123 .error{
+				width: 300px;
+				height: 40px;
+				margin: 200px auto;
+				background-color: rgba(0, 0, 0, .1);
+				border-radius: 3px;
+				color: red;
+				text-align: center;
+				line-height: 40px;
+				z-index: 9999 !important;
+			}
+			
+			.my-table {
+				margin-top: 10px;
+				border: 1px solid rgba(0,0,0,0.05);
+				margin-left: 15px;
+			}
+			
+			tr.ant-table-row>td {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 50px;
+			}
+			
+			.margin-left-sm{
+				margin-left: 15px;
+			}
+			
+			.sex-desc {
+				display: inline-block;
+				position: absolute;
+				bottom: 8px;
+				font-size: 15px;
+				padding-left: 10px;
+			}
+			
+			@media (max-width: 768px) {
+			  .my-btn-xs {
+				  padding: 5px 5px !important;
+			      max-width: 50px !important;
+			  }
+			  .media-margin-left-sm{
+				  margin-left: 5px;
+			  }
+			}
+			
+			[v-cloak] {
+				display: none
+			}
+		</style>
+	</head>
+	<body style="border-radius: 25px;background-color: rgba(0,0,0,0.04);">
+		<!--<div class="title"><h2>通知详情</h2></div>-->
+		<div class="container-fluid margin-left-sm" id="app">
+			<transition leave-active-class="animated fadeOut" enter-active-class="animated fadeIn">
+				<div class="t123" v-show="showMask" v-cloak>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="info" v-show="showInfo">
+							<div>"{{msg}}"</div>
+						</div>
+					</transition>
+					<transition leave-active-class="animated zoomOut" enter-active-class="animated zoomIn">
+						<div class="error" v-show="showError">
+							<div>"{{msg}}"</div>
+						</div>
+					</transition>
+				</div>
+			</transition>
+
+			<form class="form-horizontal" style="margin: 150px auto;width: 600px;background-color: rgba(0,0,0,0.05);padding: 25px;">
+				<div class="form-group">
+					<label for="card" class="col-sm-2 control-label">账号:&nbsp;</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="card" v-model="person.card" required disabled>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="balance" class="col-sm-2 control-label">余额:&nbsp;</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="balance" v-model="person.balance" required disabled>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="realName" class="col-sm-2 control-label">转账方:&nbsp;</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="realName" v-model="person.realName" required disabled>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="toAccount" class="col-sm-2 control-label">收账方:&nbsp;</label>
+					<div class="col-sm-10">
+						<input type="text" placeholder="请输入对方账号"
+						 minlength="4"
+						 maxlength="20"
+						 class="form-control" id="toAccount" v-model="toAccount" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="money" class="col-sm-2 control-label">金额:&nbsp;</label>
+					<div class="col-sm-10">
+						<input type="number" step="0.01" min="0" placeholder="请输入金额" 
+							   onkeyup="value=value.replace(/[^\d.]/g,'')"
+							   class="form-control" id="money" minlength="1" v-model="money" required>
+					</div>
+				</div>
+				<div class="form-group" style="margin: 0 10px 0 15px;">
+					<button type="button" class="btn btn-primary pull-left" @click="transer();">转账</button>
+					<button type="button" class="btn btn-default pull-right" @click="reset();">重置</button>
+				</div>
+			</form>
+		</div>
+		<script src="../js/vue.min.js"></script>
+		<script src="../js/axios.min.js"></script>
+		<script>
+			var app = new Vue({
+				el: "#app",
+				data: {
+					person: {},
+					toAccount: "",
+					money: null,
+					showMask: false,
+					showInfo: false,
+					showError: false,
+					msg: ""
+				},
+				created: function() {
+					this.reset();
+				},
+				methods: {
+					openMask: function() {
+						this.showMask = true;
+					},
+					closeMask: function() {
+						this.showMask = false;
+					},
+					openInfo: function(msg) {
+						this.msg = msg;
+						this.showInfo = true;
+					},
+					closeInfo: function() {
+						this.showInfo = false;
+					},
+					openError: function(msg) {
+						this.msg = msg;
+						this.showError = true;
+					},
+					closeError: function() {
+						this.showError = false;
+					},
+					propInfo: function(msg) {
+						this.openMask();
+						this.openInfo(msg);
+						setTimeout(function() {
+							app.closeInfo();
+							app.closeMask();
+						}, 1500);
+					},
+					propError: function(msg) {
+						this.openMask();
+						this.openError(msg);
+						setTimeout(function() {
+							app.closeMask();
+							app.closeError();
+						}, 3000);
+					},
+					transer: function() {
+						if (this.toAccount === "" || this.toAccount== null) {
+							app.propError("对方账号不能为空");
+						} else if (isNaN(this.money)) {
+							app.propError("请输入正确的金额");
+						} else {
+							axios.get("../transfer?from=" + this.person.account + "&to=" + this.toAccount + "&money=" + this.money)
+								.then((res) => {
+									//console.log(res.data.msg);
+									if (res.data.msg == "success") {
+										app.propInfo("转账成功");
+										var balance = Number(this.person.balance) - Number(this.money);
+										this.person.balance = balance;
+										top.app.person = JSON.parse(JSON.stringify(this.person));
+										window.localStorage.setItem("balance", balance);
+										this.toAccount = "";
+										this.money = null;
+									} else {
+										app.propError("转账失败");
+										this.reset();
+									}
+								})
+								.catch((error) => {
+									console.log(error); //异常
+								});
+						}
+					},
+					reset: function(){
+						if (top.app.person != null) {
+							this.person = JSON.parse(JSON.stringify(top.app.person));
+							this.toAccount = "";
+							this.money = null;
+						} else{
+							app.propInfo("页面正在加载中，请稍等！");
+							setTimeout(() => {
+								this.person = JSON.parse(JSON.stringify(top.app.person));
+							}, 3000);
+						}
+					}
+				}
+			});
+		</script>
+
+	</body>
+
+
+</html>

@@ -1,16 +1,15 @@
+.metadata
+Servers
+RemoteSystemsTempFiles
+*.class
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
-!**/pom.xml
 logs/
-/.classpath
-/.project
-/.settings
-Servers/
-RemoteSystemsTempFiles/
-.metadata/
+out/
+algorithm-master
 ### STS ###
 .apt_generated
 .classpath
@@ -25,6 +24,8 @@ RemoteSystemsTempFiles/
 *.iws
 *.iml
 *.ipr
+out/
+algorithm-master
 
 ### NetBeans ###
 /nbproject/private/
