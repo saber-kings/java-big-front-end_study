@@ -24,7 +24,7 @@ public class ChangePwd extends HttpServlet {
 		super();
 	}
 
-	 @Override
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// 第一步，接收参数
