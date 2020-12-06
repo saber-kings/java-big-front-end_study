@@ -60,9 +60,9 @@ public class FilterTemplate
   protected final String TEXT_43 = NL + "         // TODO Auto-generated method stub";
   protected final String TEXT_44 = NL + "\t\t\treturn ";
   protected final String TEXT_45 = NL + "    }";
-  protected final String TEXT_46 = NL + NL + "\tpublic void destroy() {" + NL + "\t}";
-  protected final String TEXT_47 = NL + NL + "\tpublic void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {" + NL + "\t\tchain.doFilter(request, response);" + NL + "\t}";
-  protected final String TEXT_48 = NL + NL + "\tpublic void init(FilterConfig fConfig) throws ServletException {" + NL + "\t}";
+  protected final String TEXT_46 = NL + "\t@Override" + NL + "\tpublic void destroy() {" + NL + "\t}";
+  protected final String TEXT_47 = NL + "\t@Override" + NL + "\tpublic void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {" + NL + "\t\tchain.doFilter(request, response);" + NL + "\t}";
+  protected final String TEXT_48 = NL + "\t@Override" + NL + "\tpublic void init(FilterConfig fConfig) throws ServletException {" + NL + "\t}";
   protected final String TEXT_49 = NL + NL + "}";
 
   public String generate(Object argument)

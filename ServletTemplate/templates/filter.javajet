@@ -11,18 +11,18 @@
 <%@ include file="_constructors.template" %>
 <%@ include file="_methods.template" %>
 <% if (model.shouldGenDestroy()) { %>
-
+	@Override
 	public void destroy() {
 	}
 <% } %>
 <% if (model.shouldGenDoFilter()) { %>
-
+	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		chain.doFilter(request, response);
 	}
 <% } %>
 <% if (model.shouldGenInit()) { %>
-
+	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
 	}
 <% } %>

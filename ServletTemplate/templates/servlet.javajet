@@ -18,42 +18,42 @@
 <%@ include file="_constructors.template" %>
 <%@ include file="_methods.template" %>
 <% if (model.shouldGenInit()) { %>
-
+	@Override
 	public void init(ServletConfig config) throws ServletException {
 	}
 <% } %>
 <% if (model.shouldGenDestroy()) { %>
-
+	@Override
 	public void destroy() {
 	}
 <% } %>
 <% if (model.shouldGenGetServletConfig()) { %>
-
+	@Override
 	public ServletConfig getServletConfig() {
 		return null;
 	}
 <% } %>
 <% if (model.shouldGenGetServletInfo()) { %>
-
+	@Override
 	public String getServletInfo() {
 		return null; 
 	}
 <% } %>
 <% if (model.shouldGenService() && !model.isHttpServletSuperclass()) { %>
-
+	@Override
 	public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
 	}
 <% } %>
 <% if (model.shouldGenService() && model.isHttpServletSuperclass()) { %>
-
+	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	}
 <% } %>
 <% if (model.shouldGenDoGet()) { %>
-
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// 第一步，接收参数
-		String uid = request.getParameter("");
+		// 第	一步，接收参数
+		String id = request.getParameter("");
 		// 第二步，处理业务
 		String s = null;
 		// 第三步，输出
@@ -68,14 +68,14 @@
 	}
 <% } %>
 <% if (model.shouldGenDoPost()) { %>
-
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 <% if (model.shouldGenDoGet()) { %>
 		// 第一步，接收参数，以下可能用到阿里巴巴的 fastjson 组件，必须用到工具类：RequestToBean
 		//方法一：用 axios 的 POST 提交 JSON 格式的数据，所以使用 fastjson 转换成 javabean 对象
-//		Good good = JSON.parseObject(RequestToBean.getRequestPostStr(request), Good.class);
+//		Object obj = JSON.parseObject(RequestToBean.getRequestPostStr(request), Object.class);
 		//方法二：用 mui 的 POST 方式提交正常接收
-//		Good good = RequestToBean.getBeanToRequest(request, Good.class);
+//		Object obj = RequestToBean.getBeanToRequest(request, Object.class);
 		// 第二步，处理业务
 		String s = null;
 		// 第三步，输出
@@ -91,27 +91,27 @@
 	}
 <% } %>
 <% if (model.shouldGenDoPut()) { %>
-
+	@Override
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	}
 <% } %>
 <% if (model.shouldGenDoDelete()) { %>
-
+	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	}
 <% } %>
 <% if (model.shouldGenDoHead()) { %>
-
+	@Override
 	protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	}
 <% } %>
 <% if (model.shouldGenDoOptions()) { %>
-
+	@Override
 	protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	}
 <% } %>
 <% if (model.shouldGenDoTrace()) { %>
-
+	@Override
 	protected void doTrace(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	}
 <% } %>
