@@ -58,11 +58,19 @@ public class RequestToBean {
 	private static <T> T getObjectByClass(Class<T> clazz) {
 		T t = null;
 		try {
-			t = clazz.newInstance();
+			t = clazz.getConstructor().newInstance();
 		} catch (InstantiationException e1) {
 			e1.printStackTrace();
 		} catch (IllegalAccessException e1) {
 			e1.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
 		}
 		return t;
 	}

@@ -10,14 +10,15 @@ import org.apache.commons.beanutils.BeanUtils;
 
 /**
  * 从请求中获取参数封装到JavaBean实例中
+ * 
  * @author saber-kings
  *
  */
 public class RequestToBean {
 
 	/**
-	 * ConvertUtilsBean convertUtils = new ConvertUtilsBean();
-	 * DateConverter dateConverter = new DateConverter();
+	 * ConvertUtilsBean convertUtils = new ConvertUtilsBean(); DateConverter
+	 * dateConverter = new DateConverter();
 	 * convertUtils.register(dateConverter,Date.class);
 	 */
 
@@ -59,11 +60,19 @@ public class RequestToBean {
 	private static <T> T getObjectByClass(Class<T> clazz) {
 		T t = null;
 		try {
-			t = clazz.newInstance();
-		} catch (InstantiationException e1) {
-			e1.printStackTrace();
-		} catch (IllegalAccessException e1) {
-			e1.printStackTrace();
+			t = clazz.getConstructor().newInstance();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
 		}
 		return t;
 	}
